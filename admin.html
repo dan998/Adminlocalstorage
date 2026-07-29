@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Admin Dashboard</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#111827;
+color:white;
+padding:30px;
+}
+
+
+.card{
+
+background:#1f2937;
+padding:20px;
+border-radius:10px;
+max-width:500px;
+margin:auto;
+
+}
+
+
+button{
+
+padding:10px;
+border:none;
+border-radius:5px;
+cursor:pointer;
+
+}
+
+.approve{
+background:#22c55e;
+color:white;
+}
+
+
+.reject{
+background:#ef4444;
+color:white;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="card">
+
+<h2>Admin Dashboard</h2>
+
+<div id="result">
+
+No requests found
+
+</div>
+
+
+</div>
+
+
+
+<script>
+
+
+function loadRequest(){
+
+
+let data =
+localStorage.getItem(
+"withdrawalRequest"
+);
+
+
+
+if(data){
+
+
+let request =
+JSON.parse(data);
+
+
+
+document.getElementById("result").innerHTML = `
+
+<p>
+<b>User:</b> ${request.username}
+</p>
+
+<p>
+<b>Amount:</b> $${request.amount}
+</p>
+
+
+<p>
+<b>Status:</b> ${request.status}
+</p>
+
+
+<p>
+<b>Date:</b> ${request.date}
+</p>
+
+
+<button class="approve"
+onclick="updateStatus('Approved')">
+Approve
+</button>
+
+
+<button class="reject"
+onclick="updateStatus('Rejected')">
+Reject
+</button>
+
+
+`;
+
+}
+
+}
+
+
+
+function updateStatus(status){
+
+
+let request =
+JSON.parse(
+localStorage.getItem(
+"withdrawalRequest"
+)
+);
+
+
+
+request.status=status;
+
+
+
+localStorage.setItem(
+"withdrawalRequest",
+JSON.stringify(request)
+);
+
+
+loadRequest();
+
+
+}
+
+
+
+loadRequest();
+
+
+</script>
+
+
+</body>
+</html>
