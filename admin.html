@@ -1,165 +1,210 @@
 <!DOCTYPE html>
 <html>
 <head>
-
-<title>Admin Dashboard</title>
+<title>Admin Withdrawal Panel</title>
 
 <style>
-
 body{
 font-family:Arial;
-background:#111827;
+background:#0f172a;
 color:white;
 padding:30px;
 }
 
-
-.card{
-
-background:#1f2937;
-padding:20px;
-border-radius:10px;
+.box{
 max-width:500px;
 margin:auto;
-
+background:#1e293b;
+padding:20px;
+border-radius:10px;
 }
 
-
-button{
-
-padding:10px;
-border:none;
-border-radius:5px;
-cursor:pointer;
-
+.request{
+background:#334155;
+padding:15px;
+margin-top:15px;
+border-radius:8px;
 }
-
-.approve{
-background:#22c55e;
-color:white;
-}
-
-
-.reject{
-background:#ef4444;
-color:white;
-}
-
 </style>
 
 </head>
 
-
 <body>
 
-
-<div class="card">
+<div class="box">
 
 <h2>Admin Dashboard</h2>
 
-<div id="result">
+<p id="status">
+Waiting for user...
+</p>
 
-No requests found
+<div id="requests"></div>
 
 </div>
-
-
-</div>
-
 
 
 <script>
 
+let ws;
 
-function loadRequest(){
+let peer;
+
+let dataChannel;
 
 
-let data =
-localStorage.getItem(
-"withdrawalRequest"
+// Connect signaling server
+
+ws = new WebSocket(
+"wss://your-signaling-server.com"
 );
 
 
 
-if(data){
+ws.onopen = ()=>{
+
+document.getElementById("status").innerHTML =
+"Admin online";
+
+};
+
+
+
+// Receive user offer
+
+ws.onmessage = async(event)=>{
+
+
+let data = JSON.parse(event.data);
+
+
+
+if(data.type==="offer"){
+
+
+createPeer();
+
+
+
+await peer.setRemoteDescription(
+data.offer
+);
+
+
+
+let answer =
+await peer.createAnswer();
+
+
+await peer.setLocalDescription(answer);
+
+
+
+ws.send(JSON.stringify({
+
+type:"answer",
+
+answer:answer
+
+}));
+
+
+}
+
+
+if(data.type==="candidate"){
+
+await peer.addIceCandidate(
+data.candidate
+);
+
+}
+
+
+};
+
+
+
+
+
+function createPeer(){
+
+
+peer =
+new RTCPeerConnection();
+
+
+
+peer.onicecandidate = e=>{
+
+
+if(e.candidate){
+
+ws.send(JSON.stringify({
+
+type:"candidate",
+
+candidate:e.candidate
+
+}));
+
+}
+
+};
+
+
+
+peer.ondatachannel = e=>{
+
+
+dataChannel=e.channel;
+
+
+
+dataChannel.onmessage=e=>{
 
 
 let request =
-JSON.parse(data);
+JSON.parse(e.data);
 
 
 
-document.getElementById("result").innerHTML = `
+document.getElementById(
+"requests"
+).innerHTML +=
+`
+<div class="request">
 
-<p>
-<b>User:</b> ${request.username}
-</p>
+<b>User:</b>
+${request.username}
+<br>
 
-<p>
-<b>Amount:</b> $${request.amount}
-</p>
+<b>Amount:</b>
+${request.amount}
 
+<br>
 
-<p>
-<b>Status:</b> ${request.status}
-</p>
+<b>Status:</b>
+${request.status}
 
+<br>
 
-<p>
-<b>Date:</b> ${request.date}
-</p>
+<b>Date:</b>
+${request.date}
 
-
-<button class="approve"
-onclick="updateStatus('Approved')">
-Approve
-</button>
-
-
-<button class="reject"
-onclick="updateStatus('Rejected')">
-Reject
-</button>
-
-
+</div>
 `;
 
-}
-
-}
 
 
-
-function updateStatus(status){
-
-
-let request =
-JSON.parse(
-localStorage.getItem(
-"withdrawalRequest"
-)
-);
+};
 
 
+};
 
-request.status=status;
-
-
-
-localStorage.setItem(
-"withdrawalRequest",
-JSON.stringify(request)
-);
-
-
-loadRequest();
 
 
 }
-
-
-
-loadRequest();
 
 
 </script>
