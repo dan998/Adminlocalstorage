@@ -15,33 +15,33 @@ const STORAGE_NODE_COLUMNS = {
 
   STORAGE_ID: 2,
 
-  ROOM_ID: 3,
+  NAME: 3,
 
-  NAME: 4,
+  PROVIDER: 4,
 
-  TYPE: 5,
+  ACCOUNT_ID: 5,
 
-  STATUS: 6,
+  DRIVE_ID: 6,
 
-  PROVIDER: 7,
+  ROOT_FOLDER_ID: 7,
 
-  ACCOUNT_EMAIL: 8,
+  TYPE: 8,
 
-  DRIVE_ID: 9,
+  STATUS: 9,
 
-  ROOT_FOLDER_ID: 10,
+  TOTAL_BYTES: 10,
 
-  TOTAL_BYTES: 11,
+  USED_BYTES: 11,
 
-  USED_BYTES: 12,
+  AVAILABLE_BYTES: 12,
 
-  AVAILABLE_BYTES: 13,
+  MAX_FILE_SIZE: 13,
 
-  MAX_FILE_SIZE: 14,
+  PRIORITY: 14,
 
-  PRIORITY: 15,
+  ALLOCATION_WEIGHT: 15,
 
-  WEIGHT: 16,
+  FILE_COUNT: 16,
 
   LAST_HEALTH_CHECK: 17,
 
@@ -57,31 +57,34 @@ const STORAGE_NODE_COLUMNS = {
 
 
 // =====================================================
-// NODE TYPES
+// STORAGE NODE TYPES
 // =====================================================
 
-const STORAGE_NODE_TYPES = Object.freeze({
+const STORAGE_NODE_TYPES = {
 
   GOOGLE_DRIVE:
-    "GoogleDrive",
+    "Google Drive",
 
-  GOOGLE_SHARED_DRIVE:
-    "GoogleSharedDrive",
+  GOOGLE_CLOUD:
+    "Google Cloud",
+
+  LOCAL:
+    "Local",
 
   EXTERNAL:
     "External",
 
-  LOCAL:
-    "Local"
+  CUSTOM:
+    "Custom"
 
-});
+};
 
 
 // =====================================================
-// NODE STATUS
+// STORAGE NODE STATUS
 // =====================================================
 
-const STORAGE_NODE_STATUS = Object.freeze({
+const STORAGE_NODE_STATUS = {
 
   ACTIVE:
     "Active",
@@ -92,40 +95,130 @@ const STORAGE_NODE_STATUS = Object.freeze({
   FULL:
     "Full",
 
-  ERROR:
-    "Error",
-
   MAINTENANCE:
     "Maintenance",
 
   DISABLED:
-    "Disabled"
+    "Disabled",
 
-});
+  ERROR:
+    "Error",
 
+  UNAUTHORIZED:
+    "Unauthorized"
 
-// =====================================================
-// DEFAULT VALUES
-// =====================================================
-
-const DEFAULT_STORAGE_NODE_TYPE =
-  STORAGE_NODE_TYPES.GOOGLE_DRIVE;
-
-
-const DEFAULT_STORAGE_NODE_STATUS =
-  STORAGE_NODE_STATUS.ACTIVE;
-
-
-const DEFAULT_STORAGE_NODE_PRIORITY =
-  1;
-
-
-const DEFAULT_STORAGE_NODE_WEIGHT =
-  1;
+};
 
 
 // =====================================================
-// CREATE NODE OBJECT
+// STORAGE NODE DEFAULTS
+// =====================================================
+
+const STORAGE_NODE_DEFAULTS = {
+
+  TYPE:
+    STORAGE_NODE_TYPES.GOOGLE_DRIVE,
+
+  STATUS:
+    STORAGE_NODE_STATUS.ACTIVE,
+
+  TOTAL_BYTES:
+    0,
+
+  USED_BYTES:
+    0,
+
+  AVAILABLE_BYTES:
+    0,
+
+  MAX_FILE_SIZE:
+    100 * 1024 * 1024,
+
+  PRIORITY:
+    100,
+
+  ALLOCATION_WEIGHT:
+    1,
+
+  FILE_COUNT:
+    0
+
+};
+
+
+// =====================================================
+// STORAGE NODE LIMITS
+// =====================================================
+
+const STORAGE_NODE_LIMITS = {
+
+  MAX_NAME_LENGTH:
+    100,
+
+  MAX_ACCOUNT_ID_LENGTH:
+    200,
+
+  MAX_DRIVE_ID_LENGTH:
+    200,
+
+  MAX_FOLDER_ID_LENGTH:
+    200,
+
+  MAX_ERROR_LENGTH:
+    500,
+
+  MAX_NODES_PER_STORAGE:
+    1000
+
+};
+
+
+// =====================================================
+// GET STORAGE NODE SHEET
+// =====================================================
+
+function getStorageNodesSheet() {
+
+  return getSheet(
+    SHEETS.STORAGE_NODES
+  );
+
+}
+
+
+// =====================================================
+// GENERATE NODE ID
+// =====================================================
+
+function generateStorageNodeId() {
+
+  if (
+    typeof generateID ===
+    "function" &&
+    typeof ID_PREFIXES !==
+    "undefined" &&
+    ID_PREFIXES.STORAGE_NODE
+  ) {
+
+    return generateID(
+      ID_PREFIXES.STORAGE_NODE
+    );
+
+  }
+
+
+  return (
+    "NODE-" +
+    Utilities.getUuid()
+      .substring(0, 8)
+      .toUpperCase()
+  );
+
+}
+
+
+// =====================================================
+// BUILD STORAGE NODE
 // =====================================================
 
 function buildStorageNodeRecord(
@@ -140,88 +233,120 @@ function buildStorageNodeRecord(
     new Date();
 
 
-  const id =
-    data.id ||
-    generateID(
-      ID_PREFIXES.STORAGE_NODE
+  const totalBytes =
+    normalizeStorageNodeBytes(
+      data.totalBytes,
+      STORAGE_NODE_DEFAULTS.TOTAL_BYTES
+    );
+
+
+  const usedBytes =
+    normalizeStorageNodeBytes(
+      data.usedBytes,
+      STORAGE_NODE_DEFAULTS.USED_BYTES
     );
 
 
   return {
 
     id:
-      id,
+      data.id ||
+      generateStorageNodeId(),
 
     storageId:
       data.storageId ||
       "",
 
-    roomId:
-      data.roomId ||
-      "",
-
     name:
-      data.name ||
-      "Storage Node",
-
-    type:
-      data.type ||
-      DEFAULT_STORAGE_NODE_TYPE,
-
-    status:
-      data.status ||
-      DEFAULT_STORAGE_NODE_STATUS,
+      normalizeStorageNodeName(
+        data.name
+      ),
 
     provider:
       data.provider ||
-      "Google Drive",
+      STORAGE_NODE_DEFAULTS.TYPE,
 
-    accountEmail:
-      data.accountEmail ||
-      "",
+    accountId:
+      String(
+        data.accountId ||
+        ""
+      )
+        .trim()
+        .substring(
+          0,
+          STORAGE_NODE_LIMITS
+            .MAX_ACCOUNT_ID_LENGTH
+        ),
 
     driveId:
-      data.driveId ||
-      "",
+      String(
+        data.driveId ||
+        ""
+      )
+        .trim()
+        .substring(
+          0,
+          STORAGE_NODE_LIMITS
+            .MAX_DRIVE_ID_LENGTH
+        ),
 
     rootFolderId:
-      data.rootFolderId ||
-      "",
+      String(
+        data.rootFolderId ||
+        ""
+      )
+        .trim()
+        .substring(
+          0,
+          STORAGE_NODE_LIMITS
+            .MAX_FOLDER_ID_LENGTH
+        ),
+
+    type:
+      data.type ||
+      STORAGE_NODE_DEFAULTS.TYPE,
+
+    status:
+      data.status ||
+      STORAGE_NODE_DEFAULTS.STATUS,
 
     totalBytes:
-      Number(
-        data.totalBytes ||
-        0
-      ),
+      totalBytes,
 
     usedBytes:
-      Number(
-        data.usedBytes ||
-        0
+      Math.min(
+        usedBytes,
+        totalBytes
       ),
 
     availableBytes:
-      Number(
-        data.availableBytes ||
-        0
+      calculateStorageNodeAvailable(
+        totalBytes,
+        usedBytes
       ),
 
     maxFileSize:
-      Number(
-        data.maxFileSize ||
-        0
+      normalizeStorageNodeBytes(
+        data.maxFileSize,
+        STORAGE_NODE_DEFAULTS.MAX_FILE_SIZE
       ),
 
     priority:
-      Number(
-        data.priority ||
-        DEFAULT_STORAGE_NODE_PRIORITY
+      normalizeStorageNodeNumber(
+        data.priority,
+        STORAGE_NODE_DEFAULTS.PRIORITY
       ),
 
-    weight:
-      Number(
-        data.weight ||
-        DEFAULT_STORAGE_NODE_WEIGHT
+    allocationWeight:
+      normalizeStorageNodeNumber(
+        data.allocationWeight,
+        STORAGE_NODE_DEFAULTS.ALLOCATION_WEIGHT
+      ),
+
+    fileCount:
+      normalizeStorageNodeNumber(
+        data.fileCount,
+        STORAGE_NODE_DEFAULTS.FILE_COUNT
       ),
 
     lastHealthCheck:
@@ -229,8 +354,15 @@ function buildStorageNodeRecord(
       "",
 
     lastError:
-      data.lastError ||
-      "",
+      String(
+        data.lastError ||
+        ""
+      )
+        .substring(
+          0,
+          STORAGE_NODE_LIMITS
+            .MAX_ERROR_LENGTH
+        ),
 
     createdBy:
       data.createdBy ||
@@ -250,6 +382,387 @@ function buildStorageNodeRecord(
 
 
 // =====================================================
+// NORMALIZE NODE NAME
+// =====================================================
+
+function normalizeStorageNodeName(
+  name
+) {
+
+  const value =
+    String(
+      name ||
+      "Storage Node"
+    )
+      .trim();
+
+
+  return value.substring(
+    0,
+    STORAGE_NODE_LIMITS
+      .MAX_NAME_LENGTH
+  );
+
+}
+
+
+// =====================================================
+// NORMALIZE NODE BYTES
+// =====================================================
+
+function normalizeStorageNodeBytes(
+  value,
+  fallback
+) {
+
+  const number =
+    Number(
+      value
+    );
+
+
+  if (
+    !isFinite(number) ||
+    number < 0
+  ) {
+
+    return Number(
+      fallback ||
+      0
+    );
+
+  }
+
+
+  return Math.floor(
+    number
+  );
+
+}
+
+
+// =====================================================
+// NORMALIZE NODE NUMBER
+// =====================================================
+
+function normalizeStorageNodeNumber(
+  value,
+  fallback
+) {
+
+  const number =
+    Number(
+      value
+    );
+
+
+  if (
+    !isFinite(number) ||
+    number < 0
+  ) {
+
+    return Number(
+      fallback ||
+      0
+    );
+
+  }
+
+
+  return Math.floor(
+    number
+  );
+
+}
+
+
+// =====================================================
+// CALCULATE NODE AVAILABLE STORAGE
+// =====================================================
+
+function calculateStorageNodeAvailable(
+  totalBytes,
+  usedBytes
+) {
+
+  totalBytes =
+    normalizeStorageNodeBytes(
+      totalBytes,
+      0
+    );
+
+
+  usedBytes =
+    normalizeStorageNodeBytes(
+      usedBytes,
+      0
+    );
+
+
+  return Math.max(
+    0,
+    totalBytes -
+    usedBytes
+  );
+
+}
+
+
+// =====================================================
+// CONVERT NODE OBJECT TO SHEET ROW
+// =====================================================
+
+function storageNodeObjectToRow(
+  node
+) {
+
+  if (
+    !node
+  ) {
+
+    throw new Error(
+      "Storage node is required"
+    );
+
+  }
+
+
+  return [
+
+    node.id || "",
+
+    node.storageId || "",
+
+    node.name || "",
+
+    node.provider || "",
+
+    node.accountId || "",
+
+    node.driveId || "",
+
+    node.rootFolderId || "",
+
+    node.type || "",
+
+    node.status || "",
+
+    Number(
+      node.totalBytes || 0
+    ),
+
+    Number(
+      node.usedBytes || 0
+    ),
+
+    calculateStorageNodeAvailable(
+      node.totalBytes,
+      node.usedBytes
+    ),
+
+    Number(
+      node.maxFileSize || 0
+    ),
+
+    Number(
+      node.priority || 0
+    ),
+
+    Number(
+      node.allocationWeight || 1
+    ),
+
+    Number(
+      node.fileCount || 0
+    ),
+
+    node.lastHealthCheck || "",
+
+    node.lastError || "",
+
+    node.createdBy || "",
+
+    node.createdAt || "",
+
+    node.updatedAt || ""
+
+  ];
+
+}
+
+
+// =====================================================
+// CONVERT SHEET ROW TO NODE OBJECT
+// =====================================================
+
+function storageNodeRowToObject(
+  row,
+  rowNumber
+) {
+
+  if (
+    !row
+  ) {
+
+    return null;
+
+  }
+
+
+  const totalBytes =
+    Number(
+      row[
+        STORAGE_NODE_COLUMNS
+          .TOTAL_BYTES - 1
+      ] || 0
+    );
+
+
+  const usedBytes =
+    Number(
+      row[
+        STORAGE_NODE_COLUMNS
+          .USED_BYTES - 1
+      ] || 0
+    );
+
+
+  return {
+
+    row:
+      rowNumber || null,
+
+    id:
+      row[
+        STORAGE_NODE_COLUMNS.ID - 1
+      ] || "",
+
+    storageId:
+      row[
+        STORAGE_NODE_COLUMNS.STORAGE_ID - 1
+      ] || "",
+
+    name:
+      row[
+        STORAGE_NODE_COLUMNS.NAME - 1
+      ] || "",
+
+    provider:
+      row[
+        STORAGE_NODE_COLUMNS.PROVIDER - 1
+      ] || "",
+
+    accountId:
+      row[
+        STORAGE_NODE_COLUMNS.ACCOUNT_ID - 1
+      ] || "",
+
+    driveId:
+      row[
+        STORAGE_NODE_COLUMNS.DRIVE_ID - 1
+      ] || "",
+
+    rootFolderId:
+      row[
+        STORAGE_NODE_COLUMNS.ROOT_FOLDER_ID - 1
+      ] || "",
+
+    type:
+      row[
+        STORAGE_NODE_COLUMNS.TYPE - 1
+      ] || "",
+
+    status:
+      row[
+        STORAGE_NODE_COLUMNS.STATUS - 1
+      ] || "",
+
+    totalBytes:
+      totalBytes,
+
+    usedBytes:
+      usedBytes,
+
+    availableBytes:
+      calculateStorageNodeAvailable(
+        totalBytes,
+        usedBytes
+      ),
+
+    maxFileSize:
+      Number(
+        row[
+          STORAGE_NODE_COLUMNS
+            .MAX_FILE_SIZE - 1
+        ] ||
+        STORAGE_NODE_DEFAULTS
+          .MAX_FILE_SIZE
+      ),
+
+    priority:
+      Number(
+        row[
+          STORAGE_NODE_COLUMNS
+            .PRIORITY - 1
+        ] ||
+        STORAGE_NODE_DEFAULTS
+          .PRIORITY
+      ),
+
+    allocationWeight:
+      Number(
+        row[
+          STORAGE_NODE_COLUMNS
+            .ALLOCATION_WEIGHT - 1
+        ] ||
+        STORAGE_NODE_DEFAULTS
+          .ALLOCATION_WEIGHT
+      ),
+
+    fileCount:
+      Number(
+        row[
+          STORAGE_NODE_COLUMNS
+            .FILE_COUNT - 1
+        ] || 0
+      ),
+
+    lastHealthCheck:
+      row[
+        STORAGE_NODE_COLUMNS
+          .LAST_HEALTH_CHECK - 1
+      ] || "",
+
+    lastError:
+      row[
+        STORAGE_NODE_COLUMNS
+          .LAST_ERROR - 1
+      ] || "",
+
+    createdBy:
+      row[
+        STORAGE_NODE_COLUMNS
+          .CREATED_BY - 1
+      ] || "",
+
+    createdAt:
+      row[
+        STORAGE_NODE_COLUMNS
+          .CREATED_AT - 1
+      ] || "",
+
+    updatedAt:
+      row[
+        STORAGE_NODE_COLUMNS
+          .UPDATED_AT - 1
+      ] || ""
+
+  };
+
+}
+
+
+// =====================================================
 // FIND NODE BY ID
 // =====================================================
 
@@ -257,7 +770,9 @@ function findStorageNodeById(
   nodeId
 ) {
 
-  if (!nodeId) {
+  if (
+    !nodeId
+  ) {
 
     return null;
 
@@ -265,9 +780,7 @@ function findStorageNodeById(
 
 
   const sheet =
-    getSheet(
-      SHEETS.STORAGE_NODES
-    );
+    getStorageNodesSheet();
 
 
   const values =
@@ -282,23 +795,19 @@ function findStorageNodeById(
     i++
   ) {
 
-    const row =
-      values[i];
-
-
-    const id =
-      row[
-        STORAGE_NODE_COLUMNS.ID - 1
-      ];
-
-
     if (
-      String(id) ===
-      String(nodeId)
+      String(
+        values[i][
+          STORAGE_NODE_COLUMNS.ID - 1
+        ] || ""
+      ) ===
+      String(
+        nodeId
+      )
     ) {
 
       return storageNodeRowToObject(
-        row,
+        values[i],
         i + 1
       );
 
@@ -313,57 +822,54 @@ function findStorageNodeById(
 
 
 // =====================================================
-// FIND NODE BY DRIVE ID
+// FIND NODE BY NAME
 // =====================================================
 
-function findStorageNodeByDriveId(
-  driveId
+function findStorageNodeByName(
+  storageId,
+  name
 ) {
 
-  if (!driveId) {
+  if (
+    !storageId ||
+    !name
+  ) {
 
     return null;
 
   }
 
 
-  const sheet =
-    getSheet(
-      SHEETS.STORAGE_NODES
+  const target =
+    String(
+      name
+    )
+      .trim()
+      .toLowerCase();
+
+
+  const nodes =
+    getStorageNodesByStorageId(
+      storageId
     );
 
 
-  const values =
-    sheet
-      .getDataRange()
-      .getValues();
-
-
   for (
-    let i = 1;
-    i < values.length;
+    let i = 0;
+    i < nodes.length;
     i++
   ) {
 
-    const row =
-      values[i];
-
-
-    const rowDriveId =
-      row[
-        STORAGE_NODE_COLUMNS.DRIVE_ID - 1
-      ];
-
-
     if (
-      String(rowDriveId) ===
-      String(driveId)
+      String(
+        nodes[i].name
+      )
+        .trim()
+        .toLowerCase() ===
+      target
     ) {
 
-      return storageNodeRowToObject(
-        row,
-        i + 1
-      );
+      return nodes[i];
 
     }
 
@@ -371,142 +877,6 @@ function findStorageNodeByDriveId(
 
 
   return null;
-
-}
-
-
-// =====================================================
-// FIND NODES BY STORAGE ID
-// =====================================================
-
-function getStorageNodesByStorageId(
-  storageId
-) {
-
-  if (!storageId) {
-
-    return [];
-
-  }
-
-
-  const sheet =
-    getSheet(
-      SHEETS.STORAGE_NODES
-    );
-
-
-  const values =
-    sheet
-      .getDataRange()
-      .getValues();
-
-
-  const nodes = [];
-
-
-  for (
-    let i = 1;
-    i < values.length;
-    i++
-  ) {
-
-    const row =
-      values[i];
-
-
-    const rowStorageId =
-      row[
-        STORAGE_NODE_COLUMNS.STORAGE_ID - 1
-      ];
-
-
-    if (
-      String(rowStorageId) ===
-      String(storageId)
-    ) {
-
-      nodes.push(
-        storageNodeRowToObject(
-          row,
-          i + 1
-        )
-      );
-
-    }
-
-  }
-
-
-  return nodes;
-
-}
-
-
-// =====================================================
-// FIND NODES BY ROOM ID
-// =====================================================
-
-function getStorageNodesByRoomId(
-  roomId
-) {
-
-  if (!roomId) {
-
-    return [];
-
-  }
-
-
-  const sheet =
-    getSheet(
-      SHEETS.STORAGE_NODES
-    );
-
-
-  const values =
-    sheet
-      .getDataRange()
-      .getValues();
-
-
-  const nodes = [];
-
-
-  for (
-    let i = 1;
-    i < values.length;
-    i++
-  ) {
-
-    const row =
-      values[i];
-
-
-    const rowRoomId =
-      row[
-        STORAGE_NODE_COLUMNS.ROOM_ID - 1
-      ];
-
-
-    if (
-      String(rowRoomId) ===
-      String(roomId)
-    ) {
-
-      nodes.push(
-        storageNodeRowToObject(
-          row,
-          i + 1
-        )
-      );
-
-    }
-
-  }
-
-
-  return nodes;
 
 }
 
@@ -518,9 +888,7 @@ function getStorageNodesByRoomId(
 function getAllStorageNodes() {
 
   const sheet =
-    getSheet(
-      SHEETS.STORAGE_NODES
-    );
+    getStorageNodesSheet();
 
 
   const values =
@@ -538,12 +906,8 @@ function getAllStorageNodes() {
     i++
   ) {
 
-    const row =
-      values[i];
-
-
     if (
-      !row[
+      !values[i][
         STORAGE_NODE_COLUMNS.ID - 1
       ]
     ) {
@@ -555,7 +919,7 @@ function getAllStorageNodes() {
 
     nodes.push(
       storageNodeRowToObject(
-        row,
+        values[i],
         i + 1
       )
     );
@@ -569,26 +933,83 @@ function getAllStorageNodes() {
 
 
 // =====================================================
+// GET NODES BY STORAGE
+// =====================================================
+
+function getStorageNodesByStorageId(
+  storageId
+) {
+
+  if (
+    !storageId
+  ) {
+
+    return [];
+
+  }
+
+
+  return getAllStorageNodes()
+    .filter(
+      function(node) {
+
+        return String(
+          node.storageId
+        ) ===
+        String(
+          storageId
+        );
+
+      }
+    );
+
+}
+
+
+// =====================================================
 // GET ACTIVE NODES
 // =====================================================
 
-function getActiveStorageNodes() {
+function getActiveStorageNodes(
+  storageId
+) {
 
-  const nodes =
+  let nodes =
     getAllStorageNodes();
+
+
+  if (
+    storageId
+  ) {
+
+    nodes =
+      nodes.filter(
+        function(node) {
+
+          return String(
+            node.storageId
+          ) ===
+          String(
+            storageId
+          );
+
+        }
+      );
+
+  }
 
 
   return nodes.filter(
     function(node) {
 
-      return String(
-        node.status || ""
-      )
-        .toLowerCase() ===
+      return (
+        String(
+          node.status
+        ).toLowerCase() ===
         String(
           STORAGE_NODE_STATUS.ACTIVE
-        )
-          .toLowerCase();
+        ).toLowerCase()
+      );
 
     }
   );
@@ -600,205 +1021,130 @@ function getActiveStorageNodes() {
 // GET AVAILABLE NODES
 // =====================================================
 
-function getAvailableStorageNodes() {
+function getAvailableStorageNodes(
+  requiredBytes,
+  storageId
+) {
 
-  const nodes =
-    getActiveStorageNodes();
+  requiredBytes =
+    normalizeStorageNodeBytes(
+      requiredBytes,
+      0
+    );
 
 
-  return nodes.filter(
-    function(node) {
+  return getActiveStorageNodes(
+    storageId
+  )
+    .filter(
+      function(node) {
 
-      return Number(
-        node.availableBytes || 0
-      ) > 0;
+        return (
+          node.availableBytes >=
+          requiredBytes
+        );
 
-    }
-  );
+      }
+    );
 
 }
 
 
 // =====================================================
-// CONVERT ROW TO OBJECT
+// CHECK NODE CAPACITY
 // =====================================================
 
-function storageNodeRowToObject(
-  row,
-  rowNumber
+function hasStorageNodeCapacity(
+  node,
+  requiredBytes
 ) {
 
-  return {
+  if (
+    !node
+  ) {
 
-    row:
-      rowNumber,
-
-    id:
-      row[
-        STORAGE_NODE_COLUMNS.ID - 1
-      ],
-
-    storageId:
-      row[
-        STORAGE_NODE_COLUMNS.STORAGE_ID - 1
-      ],
-
-    roomId:
-      row[
-        STORAGE_NODE_COLUMNS.ROOM_ID - 1
-      ],
-
-    name:
-      row[
-        STORAGE_NODE_COLUMNS.NAME - 1
-      ],
-
-    type:
-      row[
-        STORAGE_NODE_COLUMNS.TYPE - 1
-      ],
-
-    status:
-      row[
-        STORAGE_NODE_COLUMNS.STATUS - 1
-      ],
-
-    provider:
-      row[
-        STORAGE_NODE_COLUMNS.PROVIDER - 1
-      ],
-
-    accountEmail:
-      row[
-        STORAGE_NODE_COLUMNS.ACCOUNT_EMAIL - 1
-      ],
-
-    driveId:
-      row[
-        STORAGE_NODE_COLUMNS.DRIVE_ID - 1
-      ],
-
-    rootFolderId:
-      row[
-        STORAGE_NODE_COLUMNS.ROOT_FOLDER_ID - 1
-      ],
-
-    totalBytes:
-      Number(
-        row[
-          STORAGE_NODE_COLUMNS.TOTAL_BYTES - 1
-        ] || 0
-      ),
-
-    usedBytes:
-      Number(
-        row[
-          STORAGE_NODE_COLUMNS.USED_BYTES - 1
-        ] || 0
-      ),
-
-    availableBytes:
-      Number(
-        row[
-          STORAGE_NODE_COLUMNS.AVAILABLE_BYTES - 1
-        ] || 0
-      ),
-
-    maxFileSize:
-      Number(
-        row[
-          STORAGE_NODE_COLUMNS.MAX_FILE_SIZE - 1
-        ] || 0
-      ),
-
-    priority:
-      Number(
-        row[
-          STORAGE_NODE_COLUMNS.PRIORITY - 1
-        ] || 0
-      ),
-
-    weight:
-      Number(
-        row[
-          STORAGE_NODE_COLUMNS.WEIGHT - 1
-        ] || 0
-      ),
-
-    lastHealthCheck:
-      row[
-        STORAGE_NODE_COLUMNS.LAST_HEALTH_CHECK - 1
-      ],
-
-    lastError:
-      row[
-        STORAGE_NODE_COLUMNS.LAST_ERROR - 1
-      ],
-
-    createdBy:
-      row[
-        STORAGE_NODE_COLUMNS.CREATED_BY - 1
-      ],
-
-    createdAt:
-      row[
-        STORAGE_NODE_COLUMNS.CREATED_AT - 1
-      ],
-
-    updatedAt:
-      row[
-        STORAGE_NODE_COLUMNS.UPDATED_AT - 1
-      ]
-
-  };
-
-}
-
-
-// =====================================================
-// CALCULATE NODE AVAILABLE SPACE
-// =====================================================
-
-function calculateNodeAvailableSpace(
-  node
-) {
-
-  if (!node) {
-
-    return 0;
+    return false;
 
   }
 
 
-  const total =
-    Number(
-      node.totalBytes || 0
+  requiredBytes =
+    normalizeStorageNodeBytes(
+      requiredBytes,
+      0
     );
 
 
-  const used =
-    Number(
-      node.usedBytes || 0
-    );
-
-
-  return Math.max(
-    0,
-    total - used
+  return (
+    calculateStorageNodeAvailable(
+      node.totalBytes,
+      node.usedBytes
+    ) >=
+    requiredBytes
   );
 
 }
 
 
 // =====================================================
-// CALCULATE NODE USAGE
+// CHECK NODE FILE SIZE
 // =====================================================
 
-function calculateNodeUsagePercent(
+function isStorageNodeFileSizeAllowed(
+  node,
+  fileSize
+) {
+
+  if (
+    !node
+  ) {
+
+    return false;
+
+  }
+
+
+  fileSize =
+    normalizeStorageNodeBytes(
+      fileSize,
+      0
+    );
+
+
+  const maxFileSize =
+    Number(
+      node.maxFileSize || 0
+    );
+
+
+  if (
+    maxFileSize <= 0
+  ) {
+
+    return true;
+
+  }
+
+
+  return (
+    fileSize <=
+    maxFileSize
+  );
+
+}
+
+
+// =====================================================
+// GET NODE USAGE PERCENT
+// =====================================================
+
+function getStorageNodeUsagePercent(
   node
 ) {
 
-  if (!node) {
+  if (
+    !node
+  ) {
 
     return 0;
 
@@ -841,287 +1187,210 @@ function calculateNodeUsagePercent(
 
 
 // =====================================================
-// CHECK NODE CAPACITY
+// GET BEST AVAILABLE NODE
 // =====================================================
 
-function hasNodeCapacity(
-  node,
-  requiredBytes
+function getBestAvailableStorageNode(
+  requiredBytes,
+  storageId
 ) {
 
-  if (!node) {
-
-    return false;
-
-  }
-
-
-  requiredBytes =
-    Number(
-      requiredBytes || 0
-    );
-
-
-  const available =
-    calculateNodeAvailableSpace(
-      node
-    );
-
-
-  return (
-    available >=
-    requiredBytes
-  );
-
-}
-
-
-// =====================================================
-// CHECK NODE FILE SIZE
-// =====================================================
-
-function isNodeFileSizeAllowed(
-  node,
-  fileSize
-) {
-
-  if (!node) {
-
-    return false;
-
-  }
-
-
-  fileSize =
-    Number(
-      fileSize || 0
-    );
-
-
-  const maxFileSize =
-    Number(
-      node.maxFileSize || 0
+  const nodes =
+    getAvailableStorageNodes(
+      requiredBytes,
+      storageId
     );
 
 
   if (
-    maxFileSize <= 0
+    nodes.length === 0
   ) {
 
-    return true;
+    return null;
 
   }
 
 
-  return (
-    fileSize <=
-    maxFileSize
+  nodes.sort(
+    function(a, b) {
+
+      // Higher priority first.
+      if (
+        b.priority !==
+        a.priority
+      ) {
+
+        return (
+          b.priority -
+          a.priority
+        );
+
+      }
+
+
+      // More available storage next.
+      if (
+        b.availableBytes !==
+        a.availableBytes
+      ) {
+
+        return (
+          b.availableBytes -
+          a.availableBytes
+        );
+
+      }
+
+
+      // Higher allocation weight last.
+      return (
+        b.allocationWeight -
+        a.allocationWeight
+      );
+
+    }
   );
+
+
+  return nodes[0];
 
 }
 
 
 // =====================================================
-// CHECK NODE HEALTH
+// GET LEAST USED NODE
 // =====================================================
 
-function isStorageNodeHealthy(
-  node
+function getLeastUsedStorageNode(
+  requiredBytes,
+  storageId
 ) {
 
-  if (!node) {
+  const nodes =
+    getAvailableStorageNodes(
+      requiredBytes,
+      storageId
+    );
+
+
+  if (
+    nodes.length === 0
+  ) {
+
+    return null;
+
+  }
+
+
+  nodes.sort(
+    function(a, b) {
+
+      return (
+        getStorageNodeUsagePercent(a) -
+        getStorageNodeUsagePercent(b)
+      );
+
+    }
+  );
+
+
+  return nodes[0];
+
+}
+
+
+// =====================================================
+// GET MOST AVAILABLE NODE
+// =====================================================
+
+function getMostAvailableStorageNode(
+  requiredBytes,
+  storageId
+) {
+
+  const nodes =
+    getAvailableStorageNodes(
+      requiredBytes,
+      storageId
+    );
+
+
+  if (
+    nodes.length === 0
+  ) {
+
+    return null;
+
+  }
+
+
+  nodes.sort(
+    function(a, b) {
+
+      return (
+        b.availableBytes -
+        a.availableBytes
+      );
+
+    }
+  );
+
+
+  return nodes[0];
+
+}
+
+
+// =====================================================
+// CHECK NODE USABLE
+// =====================================================
+
+function isStorageNodeUsable(
+  node,
+  requiredBytes
+) {
+
+  if (
+    !node
+  ) {
 
     return false;
 
   }
 
 
-  const status =
-    String(
-      node.status || ""
-    ).toLowerCase();
+  if (
+    node.status !==
+    STORAGE_NODE_STATUS.ACTIVE
+  ) {
 
-
-  return (
-    status ===
-    String(
-      STORAGE_NODE_STATUS.ACTIVE
-    ).toLowerCase()
-  );
-
-}
-
-
-// =====================================================
-// UPDATE NODE USAGE
-// =====================================================
-
-function updateStorageNodeUsage(
-  nodeId,
-  bytesAdded
-) {
-
-  const node =
-    findStorageNodeById(
-      nodeId
-    );
-
-
-  if (!node) {
-
-    throw new Error(
-      "Storage node not found"
-    );
+    return false;
 
   }
 
 
-  bytesAdded =
-    Number(
-      bytesAdded || 0
-    );
+  if (
+    !hasStorageNodeCapacity(
+      node,
+      requiredBytes
+    )
+  ) {
 
-
-  const newUsed =
-    Math.max(
-      0,
-      Number(
-        node.usedBytes || 0
-      ) +
-      bytesAdded
-    );
-
-
-  const newAvailable =
-    Math.max(
-      0,
-      Number(
-        node.totalBytes || 0
-      ) -
-      newUsed
-    );
-
-
-  const sheet =
-    getSheet(
-      SHEETS.STORAGE_NODES
-    );
-
-
-  sheet.getRange(
-    node.row,
-    STORAGE_NODE_COLUMNS.USED_BYTES
-  )
-    .setValue(
-      newUsed
-    );
-
-
-  sheet.getRange(
-    node.row,
-    STORAGE_NODE_COLUMNS.AVAILABLE_BYTES
-  )
-    .setValue(
-      newAvailable
-    );
-
-
-  sheet.getRange(
-    node.row,
-    STORAGE_NODE_COLUMNS.UPDATED_AT
-  )
-    .setValue(
-      new Date()
-    );
-
-
-  return {
-
-    nodeId:
-      nodeId,
-
-    usedBytes:
-      newUsed,
-
-    availableBytes:
-      newAvailable
-
-  };
-
-}
-
-
-// =====================================================
-// SET NODE STATUS
-// =====================================================
-
-function setStorageNodeStatus(
-  nodeId,
-  status,
-  errorMessage
-) {
-
-  const node =
-    findStorageNodeById(
-      nodeId
-    );
-
-
-  if (!node) {
-
-    throw new Error(
-      "Storage node not found"
-    );
+    return false;
 
   }
 
 
-  status =
-    String(
-      status || ""
-    ).trim();
+  if (
+    !isStorageNodeFileSizeAllowed(
+      node,
+      requiredBytes
+    )
+  ) {
 
-
-  if (!status) {
-
-    throw new Error(
-      "Storage node status is required"
-    );
+    return false;
 
   }
-
-
-  const sheet =
-    getSheet(
-      SHEETS.STORAGE_NODES
-    );
-
-
-  sheet.getRange(
-    node.row,
-    STORAGE_NODE_COLUMNS.STATUS
-  )
-    .setValue(
-      status
-    );
-
-
-  sheet.getRange(
-    node.row,
-    STORAGE_NODE_COLUMNS.LAST_ERROR
-  )
-    .setValue(
-      errorMessage || ""
-    );
-
-
-  sheet.getRange(
-    node.row,
-    STORAGE_NODE_COLUMNS.UPDATED_AT
-  )
-    .setValue(
-      new Date()
-    );
 
 
   return true;
@@ -1130,104 +1399,10 @@ function setStorageNodeStatus(
 
 
 // =====================================================
-// RECORD HEALTH CHECK
+// UPDATE NODE COUNTS
 // =====================================================
 
-function recordStorageNodeHealth(
-  nodeId,
-  healthy,
-  errorMessage
-) {
-
-  const node =
-    findStorageNodeById(
-      nodeId
-    );
-
-
-  if (!node) {
-
-    throw new Error(
-      "Storage node not found"
-    );
-
-  }
-
-
-  const status =
-    healthy
-      ? STORAGE_NODE_STATUS.ACTIVE
-      : STORAGE_NODE_STATUS.ERROR;
-
-
-  const sheet =
-    getSheet(
-      SHEETS.STORAGE_NODES
-    );
-
-
-  sheet.getRange(
-    node.row,
-    STORAGE_NODE_COLUMNS.STATUS
-  )
-    .setValue(
-      status
-    );
-
-
-  sheet.getRange(
-    node.row,
-    STORAGE_NODE_COLUMNS.LAST_HEALTH_CHECK
-  )
-    .setValue(
-      new Date()
-    );
-
-
-  sheet.getRange(
-    node.row,
-    STORAGE_NODE_COLUMNS.LAST_ERROR
-  )
-    .setValue(
-      healthy
-        ? ""
-        : (
-            errorMessage ||
-            "Storage node health check failed"
-          )
-    );
-
-
-  sheet.getRange(
-    node.row,
-    STORAGE_NODE_COLUMNS.UPDATED_AT
-  )
-    .setValue(
-      new Date()
-    );
-
-
-  return {
-
-    nodeId:
-      nodeId,
-
-    healthy:
-      healthy,
-
-    status:
-      status
-
-  };
-
-}
-
-
-// =====================================================
-// REMOVE NODE
-// =====================================================
-
-function removeStorageNodeRecord(
+function calculateStorageNodeCounts(
   nodeId
 ) {
 
@@ -1237,24 +1412,426 @@ function removeStorageNodeRecord(
     );
 
 
-  if (!node) {
+  if (
+    !node
+  ) {
 
-    return false;
+    return null;
 
   }
 
 
-  const sheet =
-    getSheet(
-      SHEETS.STORAGE_NODES
+  return {
+
+    nodeId:
+      node.id,
+
+    fileCount:
+      Number(
+        node.fileCount || 0
+      ),
+
+    usedBytes:
+      Number(
+        node.usedBytes || 0
+      ),
+
+    availableBytes:
+      calculateStorageNodeAvailable(
+        node.totalBytes,
+        node.usedBytes
+      )
+
+  };
+
+}
+
+
+// =====================================================
+// VALIDATE STORAGE NODE
+// =====================================================
+
+function validateStorageNode(
+  node
+) {
+
+  const errors = [];
+
+
+  if (
+    !node
+  ) {
+
+    return {
+
+      valid:
+        false,
+
+      errors: [
+        "Storage node is required"
+      ],
+
+      error:
+        "Storage node is required"
+
+    };
+
+  }
+
+
+  if (
+    !node.id
+  ) {
+
+    errors.push(
+      "Node ID is required"
+    );
+
+  }
+
+
+  if (
+    !node.storageId
+  ) {
+
+    errors.push(
+      "Storage ID is required"
+    );
+
+  }
+
+
+  if (
+    !node.name
+  ) {
+
+    errors.push(
+      "Node name is required"
+    );
+
+  }
+
+
+  if (
+    !Object
+      .values(
+        STORAGE_NODE_TYPES
+      )
+      .includes(
+        node.type
+      )
+  ) {
+
+    errors.push(
+      "Invalid node type"
+    );
+
+  }
+
+
+  if (
+    !Object
+      .values(
+        STORAGE_NODE_STATUS
+      )
+      .includes(
+        node.status
+      )
+  ) {
+
+    errors.push(
+      "Invalid node status"
+    );
+
+  }
+
+
+  const total =
+    Number(
+      node.totalBytes || 0
     );
 
 
-  sheet.deleteRow(
-    node.row
+  const used =
+    Number(
+      node.usedBytes || 0
+    );
+
+
+  if (
+    total < 0
+  ) {
+
+    errors.push(
+      "Total bytes cannot be negative"
+    );
+
+  }
+
+
+  if (
+    used < 0
+  ) {
+
+    errors.push(
+      "Used bytes cannot be negative"
+    );
+
+  }
+
+
+  if (
+    used > total
+  ) {
+
+    errors.push(
+      "Used bytes cannot exceed total bytes"
+    );
+
+  }
+
+
+  if (
+    Number(
+      node.priority || 0
+    ) < 0
+  ) {
+
+    errors.push(
+      "Priority cannot be negative"
+    );
+
+  }
+
+
+  if (
+    Number(
+      node.allocationWeight || 0
+    ) < 0
+  ) {
+
+    errors.push(
+      "Allocation weight cannot be negative"
+    );
+
+  }
+
+
+  return {
+
+    valid:
+      errors.length === 0,
+
+    errors:
+      errors,
+
+    error:
+      errors.length
+        ? errors[0]
+        : null
+
+  };
+
+}
+
+
+// =====================================================
+// GET NODE SUMMARY
+// =====================================================
+
+function getStorageNodeSummary(
+  storageId
+) {
+
+  const nodes =
+    storageId
+      ? getStorageNodesByStorageId(
+          storageId
+        )
+      : getAllStorageNodes();
+
+
+  let totalBytes =
+    0;
+
+
+  let usedBytes =
+    0;
+
+
+  let fileCount =
+    0;
+
+
+  let active =
+    0;
+
+
+  let full =
+    0;
+
+
+  let errors =
+    0;
+
+
+  nodes.forEach(
+    function(node) {
+
+      totalBytes +=
+        Number(
+          node.totalBytes || 0
+        );
+
+
+      usedBytes +=
+        Number(
+          node.usedBytes || 0
+        );
+
+
+      fileCount +=
+        Number(
+          node.fileCount || 0
+        );
+
+
+      if (
+        node.status ===
+        STORAGE_NODE_STATUS.ACTIVE
+      ) {
+
+        active++;
+
+      }
+
+
+      if (
+        node.status ===
+        STORAGE_NODE_STATUS.FULL
+      ) {
+
+        full++;
+
+      }
+
+
+      if (
+        node.status ===
+        STORAGE_NODE_STATUS.ERROR
+      ) {
+
+        errors++;
+
+      }
+
+    }
   );
 
 
-  return true;
+  return {
+
+    storageId:
+      storageId || "",
+
+    nodeCount:
+      nodes.length,
+
+    activeNodes:
+      active,
+
+    fullNodes:
+      full,
+
+    errorNodes:
+      errors,
+
+    totalBytes:
+      totalBytes,
+
+    usedBytes:
+      usedBytes,
+
+    availableBytes:
+      calculateStorageNodeAvailable(
+        totalBytes,
+        usedBytes
+      ),
+
+    fileCount:
+      fileCount
+
+  };
+
+}
+
+
+// =====================================================
+// GET NODE HEALTH INFORMATION
+// =====================================================
+
+function getStorageNodeHealthInfo(
+  nodeId
+) {
+
+  const node =
+    findStorageNodeById(
+      nodeId
+    );
+
+
+  if (
+    !node
+  ) {
+
+    return {
+
+      healthy:
+        false,
+
+      status:
+        STORAGE_NODE_STATUS.ERROR,
+
+      error:
+        "Storage node not found"
+
+    };
+
+  }
+
+
+  return {
+
+    healthy:
+      node.status ===
+      STORAGE_NODE_STATUS.ACTIVE,
+
+    nodeId:
+      node.id,
+
+    name:
+      node.name,
+
+    provider:
+      node.provider,
+
+    status:
+      node.status,
+
+    availableBytes:
+      node.availableBytes,
+
+    usagePercent:
+      getStorageNodeUsagePercent(
+        node
+      ),
+
+    lastHealthCheck:
+      node.lastHealthCheck,
+
+    lastError:
+      node.lastError
+
+  };
 
 }

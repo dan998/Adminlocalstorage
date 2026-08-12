@@ -43,6 +43,14 @@ const STORAGE_COLUMNS = {
 
 
 // =====================================================
+// STORAGE MODEL VERSION
+// =====================================================
+
+const STORAGE_MODEL_VERSION =
+  "1.0.0";
+
+
+// =====================================================
 // DEFAULT STORAGE VALUES
 // =====================================================
 
@@ -71,7 +79,43 @@ const STORAGE_LIMITS = {
     100,
 
   MAX_DESCRIPTION_LENGTH:
-    500
+    500,
+
+  MIN_TOTAL_BYTES:
+    0,
+
+  MIN_USED_BYTES:
+    0,
+
+  MIN_FILE_SIZE:
+    0
+
+};
+
+
+// =====================================================
+// STORAGE DEFAULTS
+// =====================================================
+
+const STORAGE_DEFAULTS = {
+
+  MAX_FILE_SIZE:
+    100 * 1024 * 1024,
+
+  TOTAL_BYTES:
+    0,
+
+  USED_BYTES:
+    0,
+
+  AVAILABLE_BYTES:
+    0,
+
+  ROOM_COUNT:
+    0,
+
+  NODE_COUNT:
+    0
 
 };
 
@@ -99,14 +143,36 @@ function buildStorageRecord(
     );
 
 
+  const totalBytes =
+    normalizeStorageBytes(
+      data.totalBytes,
+      STORAGE_DEFAULTS.TOTAL_BYTES
+    );
+
+
+  const usedBytes =
+    normalizeStorageBytes(
+      data.usedBytes,
+      STORAGE_DEFAULTS.USED_BYTES
+    );
+
+
+  const availableBytes =
+    calculateStorageAvailable(
+      totalBytes,
+      usedBytes
+    );
+
+
   return {
 
     id:
       id,
 
     name:
-      data.name ||
-      "Storage",
+      normalizeStorageName(
+        data.name
+      ),
 
     type:
       data.type ||
@@ -117,43 +183,35 @@ function buildStorageRecord(
       DEFAULT_STORAGE_STATUS,
 
     description:
-      data.description ||
-      "",
+      normalizeStorageDescription(
+        data.description
+      ),
 
     totalBytes:
-      Number(
-        data.totalBytes ||
-        0
-      ),
+      totalBytes,
 
     usedBytes:
-      Number(
-        data.usedBytes ||
-        0
-      ),
+      usedBytes,
 
     availableBytes:
-      Number(
-        data.availableBytes ||
-        0
-      ),
+      availableBytes,
 
     maxFileSize:
-      Number(
-        data.maxFileSize ||
+      normalizeStorageBytes(
+        data.maxFileSize,
         STORAGE_DEFAULTS.MAX_FILE_SIZE
       ),
 
     roomCount:
-      Number(
-        data.roomCount ||
-        0
+      normalizeStorageNumber(
+        data.roomCount,
+        STORAGE_DEFAULTS.ROOM_COUNT
       ),
 
     nodeCount:
-      Number(
-        data.nodeCount ||
-        0
+      normalizeStorageNumber(
+        data.nodeCount,
+        STORAGE_DEFAULTS.NODE_COUNT
       ),
 
     createdBy:
@@ -174,230 +232,201 @@ function buildStorageRecord(
 
 
 // =====================================================
-// FIND STORAGE BY ID
+// NORMALIZE STORAGE NAME
 // =====================================================
 
-function findStorageById(
-  storageId
-) {
-
-  if (!storageId) {
-
-    return null;
-
-  }
-
-
-  const sheet =
-    getSheet(
-      SHEETS.STORAGE
-    );
-
-
-  const values =
-    sheet
-      .getDataRange()
-      .getValues();
-
-
-  for (
-    let i = 1;
-    i < values.length;
-    i++
-  ) {
-
-    const row =
-      values[i];
-
-
-    const id =
-      row[
-        STORAGE_COLUMNS.ID - 1
-      ];
-
-
-    if (
-      String(id) ===
-      String(storageId)
-    ) {
-
-      return storageRowToObject(
-        row,
-        i + 1
-      );
-
-    }
-
-  }
-
-
-  return null;
-
-}
-
-
-// =====================================================
-// FIND STORAGE BY NAME
-// =====================================================
-
-function findStorageByName(
+function normalizeStorageName(
   name
 ) {
 
-  if (!name) {
-
-    return null;
-
-  }
-
-
-  const sheet =
-    getSheet(
-      SHEETS.STORAGE
-    );
-
-
-  const values =
-    sheet
-      .getDataRange()
-      .getValues();
-
-
-  const target =
+  const value =
     String(
-      name
+      name ||
+      "Storage"
     )
-      .trim()
-      .toLowerCase();
+      .trim();
 
 
-  for (
-    let i = 1;
-    i < values.length;
-    i++
+  if (
+    !value
   ) {
 
-    const row =
-      values[i];
-
-
-    const rowName =
-      String(
-        row[
-          STORAGE_COLUMNS.NAME - 1
-        ] || ""
-      )
-        .trim()
-        .toLowerCase();
-
-
-    if (
-      rowName ===
-      target
-    ) {
-
-      return storageRowToObject(
-        row,
-        i + 1
-      );
-
-    }
+    return "Storage";
 
   }
 
 
-  return null;
+  return value
+    .substring(
+      0,
+      STORAGE_LIMITS
+        .MAX_NAME_LENGTH
+    );
 
 }
 
 
 // =====================================================
-// GET ALL STORAGE
+// NORMALIZE DESCRIPTION
 // =====================================================
 
-function getAllStorageRecords() {
+function normalizeStorageDescription(
+  description
+) {
 
-  const sheet =
-    getSheet(
-      SHEETS.STORAGE
+  return String(
+    description ||
+    ""
+  )
+    .trim()
+    .substring(
+      0,
+      STORAGE_LIMITS
+        .MAX_DESCRIPTION_LENGTH
     );
-
-
-  const values =
-    sheet
-      .getDataRange()
-      .getValues();
-
-
-  const storages = [];
-
-
-  for (
-    let i = 1;
-    i < values.length;
-    i++
-  ) {
-
-    const row =
-      values[i];
-
-
-    if (
-      !row[
-        STORAGE_COLUMNS.ID - 1
-      ]
-    ) {
-
-      continue;
-
-    }
-
-
-    storages.push(
-      storageRowToObject(
-        row,
-        i + 1
-      )
-    );
-
-  }
-
-
-  return storages;
 
 }
 
 
 // =====================================================
-// GET ACTIVE STORAGE
+// NORMALIZE STORAGE BYTES
 // =====================================================
 
-function getActiveStorageRecords() {
+function normalizeStorageBytes(
+  value,
+  defaultValue
+) {
 
-  const storages =
-    getAllStorageRecords();
+  const number =
+    Number(
+      value
+    );
 
 
-  return storages.filter(
-    function(storage) {
+  if (
+    !isFinite(number) ||
+    number < 0
+  ) {
 
-      return String(
-        storage.status || ""
-      )
-        .toLowerCase() ===
-        String(
-          STORAGE_STATUS.ACTIVE
-        )
-          .toLowerCase();
+    return Number(
+      defaultValue ||
+      0
+    );
 
-    }
+  }
+
+
+  return Math.floor(
+    number
   );
 
 }
 
 
 // =====================================================
-// CONVERT SHEET ROW TO OBJECT
+// NORMALIZE STORAGE NUMBER
+// =====================================================
+
+function normalizeStorageNumber(
+  value,
+  defaultValue
+) {
+
+  const number =
+    Number(
+      value
+    );
+
+
+  if (
+    !isFinite(number) ||
+    number < 0
+  ) {
+
+    return Number(
+      defaultValue ||
+      0
+    );
+
+  }
+
+
+  return Math.floor(
+    number
+  );
+
+}
+
+
+// =====================================================
+// CONVERT STORAGE OBJECT TO SHEET ROW
+// =====================================================
+
+function storageObjectToRow(
+  storage
+) {
+
+  if (
+    !storage
+  ) {
+
+    throw new Error(
+      "Storage object is required"
+    );
+
+  }
+
+
+  return [
+
+    storage.id || "",
+
+    storage.name || "",
+
+    storage.type || "",
+
+    storage.status || "",
+
+    storage.description || "",
+
+    Number(
+      storage.totalBytes || 0
+    ),
+
+    Number(
+      storage.usedBytes || 0
+    ),
+
+    calculateStorageAvailable(
+      storage.totalBytes,
+      storage.usedBytes
+    ),
+
+    Number(
+      storage.maxFileSize || 0
+    ),
+
+    Number(
+      storage.roomCount || 0
+    ),
+
+    Number(
+      storage.nodeCount || 0
+    ),
+
+    storage.createdBy || "",
+
+    storage.createdAt || "",
+
+    storage.updatedAt || ""
+
+  ];
+
+}
+
+
+// =====================================================
+// CONVERT SHEET ROW TO STORAGE OBJECT
 // =====================================================
 
 function storageRowToObject(
@@ -405,92 +434,124 @@ function storageRowToObject(
   rowNumber
 ) {
 
+  if (
+    !row
+  ) {
+
+    return null;
+
+  }
+
+
+  const totalBytes =
+    Number(
+      row[
+        STORAGE_COLUMNS
+          .TOTAL_BYTES - 1
+      ] || 0
+    );
+
+
+  const usedBytes =
+    Number(
+      row[
+        STORAGE_COLUMNS
+          .USED_BYTES - 1
+      ] || 0
+    );
+
+
   return {
 
     row:
-      rowNumber,
+      rowNumber || null,
 
     id:
       row[
-        STORAGE_COLUMNS.ID - 1
-      ],
+        STORAGE_COLUMNS
+          .ID - 1
+      ] || "",
 
     name:
       row[
-        STORAGE_COLUMNS.NAME - 1
-      ],
+        STORAGE_COLUMNS
+          .NAME - 1
+      ] || "",
 
     type:
       row[
-        STORAGE_COLUMNS.TYPE - 1
-      ],
+        STORAGE_COLUMNS
+          .TYPE - 1
+      ] || "",
 
     status:
       row[
-        STORAGE_COLUMNS.STATUS - 1
-      ],
+        STORAGE_COLUMNS
+          .STATUS - 1
+      ] || "",
 
     description:
       row[
-        STORAGE_COLUMNS.DESCRIPTION - 1
-      ],
+        STORAGE_COLUMNS
+          .DESCRIPTION - 1
+      ] || "",
 
     totalBytes:
-      Number(
-        row[
-          STORAGE_COLUMNS.TOTAL_BYTES - 1
-        ] || 0
-      ),
+      totalBytes,
 
     usedBytes:
-      Number(
-        row[
-          STORAGE_COLUMNS.USED_BYTES - 1
-        ] || 0
-      ),
+      usedBytes,
 
+    // Always calculate this value.
     availableBytes:
-      Number(
-        row[
-          STORAGE_COLUMNS.AVAILABLE_BYTES - 1
-        ] || 0
+      calculateStorageAvailable(
+        totalBytes,
+        usedBytes
       ),
 
     maxFileSize:
       Number(
         row[
-          STORAGE_COLUMNS.MAX_FILE_SIZE - 1
-        ] || 0
+          STORAGE_COLUMNS
+            .MAX_FILE_SIZE - 1
+        ] ||
+        STORAGE_DEFAULTS
+          .MAX_FILE_SIZE
       ),
 
     roomCount:
       Number(
         row[
-          STORAGE_COLUMNS.ROOM_COUNT - 1
+          STORAGE_COLUMNS
+            .ROOM_COUNT - 1
         ] || 0
       ),
 
     nodeCount:
       Number(
         row[
-          STORAGE_COLUMNS.NODE_COUNT - 1
+          STORAGE_COLUMNS
+            .NODE_COUNT - 1
         ] || 0
       ),
 
     createdBy:
       row[
-        STORAGE_COLUMNS.CREATED_BY - 1
-      ],
+        STORAGE_COLUMNS
+          .CREATED_BY - 1
+      ] || "",
 
     createdAt:
       row[
-        STORAGE_COLUMNS.CREATED_AT - 1
-      ],
+        STORAGE_COLUMNS
+          .CREATED_AT - 1
+      ] || "",
 
     updatedAt:
       row[
-        STORAGE_COLUMNS.UPDATED_AT - 1
-      ]
+        STORAGE_COLUMNS
+          .UPDATED_AT - 1
+      ] || ""
 
   };
 
@@ -507,25 +568,23 @@ function calculateStorageAvailable(
 ) {
 
   totalBytes =
-    Number(
-      totalBytes || 0
+    normalizeStorageBytes(
+      totalBytes,
+      0
     );
 
 
   usedBytes =
-    Number(
-      usedBytes || 0
+    normalizeStorageBytes(
+      usedBytes,
+      0
     );
-
-
-  const available =
-    totalBytes -
-    usedBytes;
 
 
   return Math.max(
     0,
-    available
+    totalBytes -
+    usedBytes
   );
 
 }
@@ -541,14 +600,16 @@ function calculateStorageUsagePercent(
 ) {
 
   totalBytes =
-    Number(
-      totalBytes || 0
+    normalizeStorageBytes(
+      totalBytes,
+      0
     );
 
 
   usedBytes =
-    Number(
-      usedBytes || 0
+    normalizeStorageBytes(
+      usedBytes,
+      0
     );
 
 
@@ -581,7 +642,63 @@ function calculateStorageUsagePercent(
 
 
 // =====================================================
-// CHECK STORAGE AVAILABILITY
+// GET STORAGE AVAILABLE BYTES
+// =====================================================
+
+function getStorageAvailableBytes(
+  storage
+) {
+
+  if (
+    !storage
+  ) {
+
+    return 0;
+
+  }
+
+
+  return calculateStorageAvailable(
+
+    storage.totalBytes,
+
+    storage.usedBytes
+
+  );
+
+}
+
+
+// =====================================================
+// GET STORAGE USAGE PERCENT
+// =====================================================
+
+function getStorageUsagePercent(
+  storage
+) {
+
+  if (
+    !storage
+  ) {
+
+    return 0;
+
+  }
+
+
+  return calculateStorageUsagePercent(
+
+    storage.totalBytes,
+
+    storage.usedBytes
+
+  );
+
+}
+
+
+// =====================================================
+// CHECK STORAGE CAPACITY
 // =====================================================
 
 function hasStorageCapacity(
@@ -589,7 +706,9 @@ function hasStorageCapacity(
   requiredBytes
 ) {
 
-  if (!storage) {
+  if (
+    !storage
+  ) {
 
     return false;
 
@@ -597,14 +716,15 @@ function hasStorageCapacity(
 
 
   requiredBytes =
-    Number(
-      requiredBytes || 0
+    normalizeStorageBytes(
+      requiredBytes,
+      0
     );
 
 
   const available =
-    Number(
-      storage.availableBytes || 0
+    getStorageAvailableBytes(
+      storage
     );
 
 
@@ -625,7 +745,9 @@ function isFileSizeAllowed(
   fileSize
 ) {
 
-  if (!storage) {
+  if (
+    !storage
+  ) {
 
     return false;
 
@@ -633,14 +755,16 @@ function isFileSizeAllowed(
 
 
   fileSize =
-    Number(
-      fileSize || 0
+    normalizeStorageBytes(
+      fileSize,
+      0
     );
 
 
   const maxFileSize =
-    Number(
-      storage.maxFileSize || 0
+    normalizeStorageBytes(
+      storage.maxFileSize,
+      0
     );
 
 
@@ -662,82 +786,90 @@ function isFileSizeAllowed(
 
 
 // =====================================================
-// UPDATE STORAGE COUNTS
+// CHECK STORAGE IS ACTIVE
 // =====================================================
 
-function updateStorageCounts(
-  storageId
+function isStorageActive(
+  storage
 ) {
 
-  const storage =
-    findStorageById(
-      storageId
-    );
+  if (
+    !storage
+  ) {
 
-
-  if (!storage) {
-
-    return null;
+    return false;
 
   }
 
 
-  const rooms =
-    getStorageRoomsByStorageId(
-      storageId
-    );
-
-
-  const nodes =
-    getStorageNodesByStorageId(
-      storageId
-    );
-
-
-  const roomCount =
-    rooms.length;
-
-
-  const nodeCount =
-    nodes.length;
-
-
-  return {
-
-    storageId:
-      storageId,
-
-    roomCount:
-      roomCount,
-
-    nodeCount:
-      nodeCount
-
-  };
+  return String(
+    storage.status ||
+    ""
+  )
+    .toLowerCase() ===
+    String(
+      STORAGE_STATUS.ACTIVE
+    )
+      .toLowerCase();
 
 }
 
 
 // =====================================================
-// STORAGE HEALTH STATUS
+// CHECK STORAGE IS FULL
 // =====================================================
 
-function getStorageStatus(
+function isStorageFull(
   storage
 ) {
 
-  if (!storage) {
+  if (
+    !storage
+  ) {
 
-    return STORAGE_STATUS.ERROR;
+    return false;
+
+  }
+
+
+  return (
+    getStorageAvailableBytes(
+      storage
+    ) <= 0
+  );
+
+}
+
+
+// =====================================================
+// GET CORE STORAGE STATUS
+// =====================================================
+
+function getStorageCoreStatus(
+  storage
+) {
+
+  if (
+    !storage
+  ) {
+
+    return (
+      typeof STORAGE_STATUS !==
+      "undefined"
+
+        ? STORAGE_STATUS.ERROR
+
+        : "Error"
+    );
 
   }
 
 
   if (
-    String(
-      storage.status || ""
-    ).toLowerCase() ===
-    "disabled"
+    typeof STORAGE_STATUS !==
+    "undefined" &&
+    storage.status ===
+    STORAGE_STATUS.DISABLED
   ) {
 
     return STORAGE_STATUS.DISABLED;
@@ -746,60 +878,56 @@ function getStorageStatus(
 
 
   if (
-    Number(
-      storage.availableBytes || 0
-    ) <= 0
+    isStorageFull(
+      storage
+    )
   ) {
 
-    return STORAGE_STATUS.FULL;
+    return (
+      typeof STORAGE_STATUS !==
+      "undefined"
+
+        ? STORAGE_STATUS.FULL
+
+        : "Full"
+    );
 
   }
 
 
-  return STORAGE_STATUS.ACTIVE;
+  return (
+    typeof STORAGE_STATUS !==
+    "undefined"
+
+      ? STORAGE_STATUS.ACTIVE
+
+      : "Active"
+  );
 
 }
 
 
 // =====================================================
-// VALIDATE STORAGE OBJECT
+// VALIDATE STORAGE NAME
 // =====================================================
 
-function validateStorageObject(
-  storage
+function validateStorageName(
+  name
 ) {
 
-  if (!storage) {
-
-    return {
-
-      valid:
-        false,
-
-      error:
-        "Storage is required"
-
-    };
-
-  }
+  const value =
+    String(
+      name ||
+      ""
+    )
+      .trim();
 
 
-  if (!storage.id) {
-
-    return {
-
-      valid:
-        false,
-
-      error:
-        "Storage ID is required"
-
-    };
-
-  }
-
-
-  if (!storage.name) {
+  if (
+    value.length <
+    STORAGE_LIMITS
+      .MIN_NAME_LENGTH
+  ) {
 
     return {
 
@@ -814,7 +942,11 @@ function validateStorageObject(
   }
 
 
-  if (!storage.type) {
+  if (
+    value.length >
+    STORAGE_LIMITS
+      .MAX_NAME_LENGTH
+  ) {
 
     return {
 
@@ -822,7 +954,7 @@ function validateStorageObject(
         false,
 
       error:
-        "Storage type is required"
+        "Storage name is too long"
 
     };
 
@@ -836,6 +968,390 @@ function validateStorageObject(
 
     error:
       null
+
+  };
+
+}
+
+
+// =====================================================
+// VALIDATE STORAGE DESCRIPTION
+// =====================================================
+
+function validateStorageDescription(
+  description
+) {
+
+  const value =
+    String(
+      description ||
+      ""
+    )
+      .trim();
+
+
+  if (
+    value.length >
+    STORAGE_LIMITS
+      .MAX_DESCRIPTION_LENGTH
+  ) {
+
+    return {
+
+      valid:
+        false,
+
+      error:
+        "Storage description is too long"
+
+    };
+
+  }
+
+
+  return {
+
+    valid:
+      true,
+
+    error:
+      null
+
+  };
+
+}
+
+
+// =====================================================
+// VALIDATE STORAGE OBJECT
+// =====================================================
+
+function validateStorageObject(
+  storage
+) {
+
+  if (
+    !storage
+  ) {
+
+    return {
+
+      valid:
+        false,
+
+      errors: [
+
+        "Storage is required"
+
+      ]
+
+    };
+
+  }
+
+
+  const errors = [];
+
+
+  // ---------------------------------------------------
+  // ID
+  // ---------------------------------------------------
+
+  if (
+    !storage.id
+  ) {
+
+    errors.push(
+      "Storage ID is required"
+    );
+
+  }
+
+
+  // ---------------------------------------------------
+  // NAME
+  // ---------------------------------------------------
+
+  const nameValidation =
+    validateStorageName(
+      storage.name
+    );
+
+
+  if (
+    !nameValidation.valid
+  ) {
+
+    errors.push(
+      nameValidation.error
+    );
+
+  }
+
+
+  // ---------------------------------------------------
+  // DESCRIPTION
+  // ---------------------------------------------------
+
+  const descriptionValidation =
+    validateStorageDescription(
+      storage.description
+    );
+
+
+  if (
+    !descriptionValidation.valid
+  ) {
+
+    errors.push(
+      descriptionValidation.error
+    );
+
+  }
+
+
+  // ---------------------------------------------------
+  // TYPE
+  // ---------------------------------------------------
+
+  if (
+    !storage.type
+  ) {
+
+    errors.push(
+      "Storage type is required"
+    );
+
+  }
+
+
+  // ---------------------------------------------------
+  // STATUS
+  // ---------------------------------------------------
+
+  if (
+    !storage.status
+  ) {
+
+    errors.push(
+      "Storage status is required"
+    );
+
+  }
+
+
+  // ---------------------------------------------------
+  // BYTE VALIDATION
+  // ---------------------------------------------------
+
+  const totalBytes =
+    Number(
+      storage.totalBytes || 0
+    );
+
+
+  const usedBytes =
+    Number(
+      storage.usedBytes || 0
+    );
+
+
+  const maxFileSize =
+    Number(
+      storage.maxFileSize || 0
+    );
+
+
+  if (
+    !isFinite(totalBytes) ||
+    totalBytes < 0
+  ) {
+
+    errors.push(
+      "Invalid total storage size"
+    );
+
+  }
+
+
+  if (
+    !isFinite(usedBytes) ||
+    usedBytes < 0
+  ) {
+
+    errors.push(
+      "Invalid used storage size"
+    );
+
+  }
+
+
+  if (
+    usedBytes >
+    totalBytes
+  ) {
+
+    errors.push(
+      "Used storage cannot exceed total storage"
+    );
+
+  }
+
+
+  if (
+    !isFinite(maxFileSize) ||
+    maxFileSize < 0
+  ) {
+
+    errors.push(
+      "Invalid maximum file size"
+    );
+
+  }
+
+
+  // ---------------------------------------------------
+  // COUNTS
+  // ---------------------------------------------------
+
+  if (
+    Number(
+      storage.roomCount || 0
+    ) < 0
+  ) {
+
+    errors.push(
+      "Invalid room count"
+    );
+
+  }
+
+
+  if (
+    Number(
+      storage.nodeCount || 0
+    ) < 0
+  ) {
+
+    errors.push(
+      "Invalid node count"
+    );
+
+  }
+
+
+  return {
+
+    valid:
+      errors.length === 0,
+
+    errors:
+      errors,
+
+    error:
+      errors.length > 0
+        ? errors[0]
+        : null
+
+  };
+
+}
+
+
+// =====================================================
+// NORMALIZE STORAGE RECORD
+// =====================================================
+
+function normalizeStorageRecord(
+  storage
+) {
+
+  if (
+    !storage
+  ) {
+
+    return null;
+
+  }
+
+
+  const record =
+    buildStorageRecord(
+      storage
+    );
+
+
+  return record;
+
+}
+
+
+// =====================================================
+// GET STORAGE MODEL CONFIG
+// =====================================================
+
+function getStorageModelConfig() {
+
+  return {
+
+    version:
+      STORAGE_MODEL_VERSION,
+
+    columns:
+      STORAGE_COLUMNS,
+
+    defaults:
+      STORAGE_DEFAULTS,
+
+    limits:
+      STORAGE_LIMITS,
+
+    defaultType:
+      DEFAULT_STORAGE_TYPE,
+
+    defaultStatus:
+      DEFAULT_STORAGE_STATUS,
+
+    defaultAllocation:
+      DEFAULT_STORAGE_ALLOCATION
+
+  };
+
+}
+
+
+// =====================================================
+// STORAGE CORE HEALTH CHECK
+// =====================================================
+
+function getStorageCoreHealth() {
+
+  const checks = {
+
+    columns:
+      !!STORAGE_COLUMNS,
+
+    defaults:
+      !!STORAGE_DEFAULTS,
+
+    limits:
+      !!STORAGE_LIMITS,
+
+    modelVersion:
+      STORAGE_MODEL_VERSION
+
+  };
+
+
+  return {
+
+    healthy:
+      checks.columns &&
+      checks.defaults &&
+      checks.limits,
+
+    checks:
+      checks
 
   };
 
