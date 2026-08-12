@@ -1,0 +1,573 @@
+CLOUD PROJECT PLATFORM
+│
+├── 00_CORE
+│   ├── Code.gs ✅️
+│   ├── Config.gs 
+│   ├── Constants.gs ✅️
+│   ├── Database.gs
+│   ├── Schema.gs ✅️
+│   ├── Helpers.gs
+│   ├── ErrorHandler.gs
+│   └── ApiResponse.gs
+│
+├── 01_API
+│   ├── ApiRouter.gs✅️
+│   ├── ApiAuthRoutes.gs✅️
+│   ├── ApiUserRoutes.gs✅️
+│   ├── ApiAdminRoutes.gs✅️
+│   ├── ApiProjectRoutes.gs✅️
+│   ├── ApiProjectUserRoutes.gs✅️
+│   ├── ApiFileRoutes.gs✅️
+│   ├── ApiFolderRoutes.gs✅️
+│   ├── ApiStorageRoutes.gs✅️
+│   ├── ApiSheetRoutes.gs ✅️
+│   ├── ApiDashboardRoutes.gs ✅️
+│   ├── ApiNotificationRoutes.gs ✅️
+│   ├── ApiEmailRoutes.gs
+│   ├── ApiPermissionRoutes.gs
+│   ├── ApiRoleRoutes.gs
+│   ├── ApiSettingsRoutes.gs
+│   ├── ApiBackupRoutes.gs
+│   ├── ApiSessionRoutes.gs
+│   └── ApiLogRoutes.gs
+│
+├── 02_AUTHENTICATION
+│   ├── Auth.gs
+│   ├── AuthRegistration.gs
+│   ├── AuthLogin.gs
+│   ├── AuthAdmin.gs
+│   ├── AuthSessions.gs
+│   ├── AuthPassword.gs
+│   ├── AuthVerification.gs
+│   ├──l AuthRecovery.gs
+│   └── AuthSecurity.gs
+│
+├── 03_USERS
+│   ├── Users.gs
+│   ├── UserCreate.gs
+│   ├── UserRead.gs
+│   ├── UserUpdate.gs
+│   ├── UserDelete.gs
+│   ├── UserStatus.gs
+│   ├── UserLimits.gs
+│   ├── UserUsage.gs
+│   ├── UserProfile.gs
+│   └── UserPreferences.gs
+│
+├── 04_ADMINS
+│   ├── Admins.gs
+│   ├── AdminCreate.gs
+│   ├── AdminRead.gs
+│   ├── AdminUpdate.gs
+│   ├── AdminDelete.gs
+│   ├── AdminStatus.gs
+│   └── AdminPermissions.gs
+│
+├── 05_PROJECTS
+│   ├── Projects.gs
+│   ├── ProjectCreate.gs
+│   ├── ProjectRead.gs
+│   ├── ProjectUpdate.gs
+│   ├── ProjectDelete.gs
+│   ├── ProjectStatus.gs
+│   ├── ProjectSettings.gs
+│   └── ProjectActivity.gs
+│
+├── 06_PROJECT_USERS
+│   ├── ProjectUsers.gs
+│   ├── ProjectUserAdd.gs
+│   ├── ProjectUserRemove.gs
+│   ├── ProjectUserRead.gs
+│   └── ProjectAccess.gs
+│
+├── 07_FILES
+│   ├── Files.gs
+│   ├── FileCreate.gs
+│   ├── FileRead.gs
+│   ├── FileUpdate.gs
+│   ├── FileDelete.gs
+│   ├── FileUpload.gs
+│   ├── FileDownload.gs
+│   ├── FilePreview.gs
+│   ├── FileSearch.gs
+│   ├── FileMetadata.gs
+│   └── FileLimits.gs
+│
+08_FOLDERS
+│
+├── Folders.gs ✅️
+│   └── Core folder/data functions
+│
+├── FolderCreate.gs ✅️
+│   └── createFolder()
+│
+├── FolderRead.gs ✅️
+│   ├── getFolder()
+│   └── getFolders()
+│
+├── FolderUpdate.gs ✅️
+│   └── updateFolder()
+│
+├── FolderDelete.gs ✅️
+│   └── deleteFolder()
+│
+└── FolderMove.gs ✅️
+    └── moveFolder()
+│
+├── 09_FILE_VERSIONS
+│   ├── Versions.gs
+│   ├── VersionCreate.gs
+│   ├── VersionRead.gs
+│   ├── VersionRestore.gs
+│   ├── VersionDelete.gs
+│   └── ChangeTracking.gs
+│
+├── 10_PROJECT_HISTORY
+│   ├── Commits.gs
+│   ├── CommitCreate.gs
+│   ├── CommitRead.gs
+│   ├── ProjectHistory.gs
+│   └── ActivityHistory.gs
+│
+11_STORAGE
+│
+├── Storage.gs ✅️
+│   └── Core constants, columns, helpers
+│
+├── StorageConfig.gs ✅️
+│   └── Storage configuration and limits
+│
+├── StorageRooms.gs ✅️
+│   └── Storage room management
+│
+├── StorageNodes.gs ✅️
+│   └── Storage node management
+│
+├── StorageCreate.gs ✅️
+│   └── Create storage records
+│
+├── StorageRead.gs ✅️
+│   └── Read and search storage
+│
+├── StorageUpdate.gs ✅️
+│   └── Update storage records
+│
+├── StorageDelete.gs ✅️
+│   └── Delete/archive storage
+│
+├── StorageRouter.gs ✅️    
+│   └── Storage API routing
+│
+├── StorageUpload.gs ✅️
+│   └── File upload handling
+│
+├── StorageDownload.gs ✅️
+│   └── File retrieval/download
+│
+├── StorageUsage.gs ✅️
+│   └── Usage calculations
+│
+├── StorageQuota.gs ✅️
+│   └── Quota enforcement
+│
+├── StorageAllocation.gs ✅️
+│   └── Allocate files to nodes/rooms
+│
+├── StoragePermissions.gs ✅️
+│   └── File access permissions
+│
+├── StorageSecurity.gs ✅️
+│   └── Storage security checks
+│
+├── StorageHealth.gs ✅️
+│   └── Health monitoring
+│
+└── StorageCleanup.gs ✅️
+    └── Orphaned/expired storage cleanup
+│
+├── 12_GOOGLE_DRIVE
+│   ├── DriveManager.gs
+│   ├── DriveFolders.gs
+│   ├── DriveFiles.gs
+│   ├── DriveUpload.gs
+│   ├── DriveDownload.gs
+│   ├── DriveDelete.gs
+│   ├── DriveSearch.gs
+│   └── DrivePermissions.gs
+│
+13_SHEETS
+│
+├── Sheets.gs ✅️
+│   └── Sheet configuration / shared definitions
+│
+├── SheetData.gs ✅️
+│   └── Underlying sheet-data records
+│
+├── SheetCreate.gs ✅️
+│   └── Create project sheets
+│
+├── SheetRead.gs ✅️
+│   └── Read sheets and data
+│
+├── SheetUpdate.gs ✅️
+│   └── Update sheet metadata
+│
+├── SheetDelete.gs ✅️
+│   └── Delete sheets
+│
+├── SheetCells.gs ✅
+│   └── Cell operations
+│
+├── SheetRows.gs ✅️
+│   └── Row operations
+│
+├── SheetColumns.gs ✅️
+│   └── Column operations
+│
+├── SheetSearch.gs ✅
+│   └── Search data
+│
+├── SheetBuilder.gs ✅
+│   └── Dynamic sheet construction
+│
+└── SheetExport.gs ✅️
+    └── CSV / XLSX / PDF export
+│
+14_EMAIL
+│
+├── Email.gs ✅️
+│   ├── Email constants
+│   ├── Email configuration
+│   ├── Email statuses
+│   ├── Email types
+│   ├── Email priorities
+│   ├── Email columns
+│   ├── Email ID generation
+│   ├── Email validation
+│   └── Shared email helpers
+│
+├── EmailConfig.gs ✅️
+│   ├── Backend email
+│   ├── Admin emails
+│   ├── Support emails
+│   ├── Reply-To
+│   ├── Sending limits
+│   ├── Retry settings
+│   ├── Queue settings
+│   └── Feature switches
+│
+├── EmailSend.gs ✅️
+│   ├── sendEmail
+│   ├── sendHtmlEmail
+│   ├── Send single email
+│   ├── Send CC/BCC
+│   ├── Validate recipients
+│   ├── Retry failed sends
+│   └── Sending engine
+│
+├── EmailRecipients.gs ✅️
+│   ├── Admin recipients
+│   ├── Support recipients
+│   ├── User recipient
+│   ├── Multiple recipients
+│   ├── CC recipients
+│   ├── BCC recipients
+│   ├── Recipient validation
+│   └── Duplicate removal
+│
+├── EmailTemplates.gs ✅️
+│   ├── Base HTML template
+│   ├── Verification template
+│   ├── Welcome template
+│   ├── Password reset template
+│   ├── Login alert template
+│   ├── Security alert template
+│   ├── Deposit template
+│   ├── Withdrawal template
+│   ├── Support template
+│   ├── Admin template
+│   └── Generic notification template
+│
+├── EmailTemplateHelpers.gs ✅️
+│   ├── HTML escaping
+│   ├── URL escaping
+│   ├── Text-to-HTML conversion
+│   ├── HTML cleanup
+│   ├── Template variables
+│   └── Branding helpers
+│
+├── EmailQueue.gs ✅️
+│   ├── Create queue item
+│   ├── Read queue
+│   ├── Process queue
+│   ├── Pending emails
+│   ├── Failed emails
+│   ├── Retry emails
+│   ├── Cancel email
+│   ├── Queue locking
+│   └── Queue cleanup
+│
+├── EmailBroadcast.gs ✅️
+│   ├── Create broadcast
+│   ├── Send broadcast
+│   ├── Admin broadcast
+│   ├── User broadcast
+│   ├── Role-based broadcast
+│   ├── Batch processing
+│   ├── Recipient limits
+│   └── Broadcast statistics
+│
+├── EmailVerification.gs ✅️
+│   ├── Generate verification token
+│   ├── Save verification token
+│   ├── Send verification email
+│   ├── Verify email
+│   ├── Resend verification
+│   ├── Verification expiration
+│   ├── Verification attempts
+│   └── Verification cleanup
+│
+├── EmailPasswordReset.gs ✅️
+│   ├── Generate reset token
+│   ├── Generate reset code
+│   ├── Save reset information
+│   ├── Send reset email
+│   ├── Verify reset code
+│   ├── Verify reset token
+│   ├── Reset expiration
+│   ├── Reset attempts
+│   └── Reset cleanup
+│
+├── EmailNotifications.gs ✅️
+│   ├── Welcome notification
+│   ├── Login notification
+│   ├── Logout notification
+│   ├── Security notification
+│   ├── Account notification
+│   ├── Deposit notification
+│   ├── Withdrawal notification
+│   ├── Bet notification
+│   ├── System notification
+│   └── Admin notification
+│
+├── EmailLogs.gs ✅️
+│   ├── Create email log
+│   ├── Read email logs
+│   ├── Update email status
+│   ├── Log successful email
+│   ├── Log failed email
+│   ├── Log retry
+│   ├── Email statistics
+│   └── Log cleanup
+│
+├── EmailSecurity.gs ✅️
+│   ├── Email authorization
+│   ├── Admin authorization
+│   ├── Broadcast authorization
+│   ├── Rate limiting
+│   ├── Abuse protection
+│   ├── Recipient restrictions
+│   └── Sensitive-email protection
+│
+├── EmailRateLimit.gs ✅️
+│   ├── Per-user limits
+│   ├── Per-IP limits
+│   ├── Per-action limits
+│   ├── Verification cooldown
+│   ├── Reset cooldown
+│   ├── Broadcast limits
+│   └── Rate-limit cleanup
+│
+├── EmailCleanup.gs ✅️
+│   ├── Expired verification cleanup
+│   ├── Expired reset cleanup
+│   ├── Queue cleanup
+│   ├── Failed email cleanup
+│   ├── Old log cleanup
+│   └── Maintenance
+│
+└── EmailAnalytics.gs  ✅️
+    ├── Total emails
+    ├── Sent emails
+    ├── Failed emails
+    ├── Pending emails
+    ├── Queued emails
+    ├── Verification statistics
+    ├── Password reset statistics
+    ├── Broadcast statistics
+    ├── Admin statistics
+    └── Email dashboard
+│
+├── 15_NOTIFICATIONS
+│   ├── Notifications.gs
+│   ├── NotificationCreate.gs
+│   ├── NotificationRead.gs
+│   ├── NotificationUpdate.gs
+│   ├── NotificationDelete.gs
+│   ├── NotificationTypes.gs
+│   └── NotificationRecipients.gs
+│
+├── 16_ROLES
+│   ├── Roles.gs
+│   ├── RoleCreate.gs
+│   ├── RoleRead.gs
+│   ├── RoleUpdate.gs
+│   ├── RoleDelete.gs
+│   └── RolePermissions.gs
+│
+├── 17_PERMISSIONS
+│   ├── Permissions.gs
+│   ├── PermissionCreate.gs
+│   ├── PermissionRead.gs
+│   ├── PermissionUpdate.gs
+│   ├── PermissionDelete.gs
+│   ├── PermissionCheck.gs
+│   └── AccessControl.gs
+│
+18_DASHBOARD
+│
+├── Dashboard.gs
+│   └── getDashboard()
+│
+├── DashboardStatistics.gs
+│   └── getDashboardStatistics()
+│
+├── DashboardUsers.gs
+│   └── getDashboardUsers()
+│
+├── DashboardProjects.gs
+│   └── getDashboardProjects()
+│
+├── DashboardFiles.gs
+│   └── getDashboardFiles()
+│
+├── DashboardStorage.gs
+│   └── getDashboardStorage()
+│
+├── DashboardActivity.gs
+│   └── getDashboardActivity()
+│
+└── DashboardSystem.gs
+    └── getDashboardSystem()
+│
+19_SESSIONS
+│
+├── Sessions.gs ✅️
+│   └── Session constants, columns, shared helpers
+│
+├── SessionConfig.gs ✅️
+│   └── Session configuration, limits, timeouts and policies
+│
+├── SessionToken.gs ✅️
+│   └── Token generation, hashing, validation and fingerprints
+│
+├── SessionCreate.gs ✅️
+│   └── Create and save sessions
+│
+├── SessionRead.gs ✅️
+│   └── Read and find sessions
+│
+├── SessionUpdate.gs ✅️
+│   └── Update status, expiry, refresh and session information
+│
+├── SessionValidate.gs ✅️
+│   └── Validate tokens, sessions and permissions
+│
+├── SessionRefresh.gs ✅️
+│   └── Refresh session expiry
+│
+├── SessionRotate.gs ✅️
+│   └── Rotate session tokens
+│
+├── SessionDevice.gs ✅️
+│   └── Device identification, binding and device security
+│
+├── SessionIP.gs ✅️
+│   └── IP tracking, IP changes and trusted IP history
+│
+├── SessionActivity.gs ✅️
+│   └── Last activity, idle detection and activity history
+│
+├── SessionLimit.gs ✅️
+│   └── Maximum concurrent sessions and session limits
+│
+├── SessionLock.gs ✅️
+│   └── Temporary/permanent session locking
+│
+├── SessionRevoke.gs ✅️
+│   └── Token/session revocation
+│
+├── SessionLogout.gs ✅️
+│   └── Logout and session termination operations
+│
+├── SessionSecurity.gs ✅️
+│   └── Hijacking detection and security enforcement
+│
+├── SessionAnalytics.gs ✅️
+│   └── Session statistics and online-user analytics
+│
+└── SessionCleanup.gs ✅️
+    └── Expired, revoked and stale-session maintenance
+│
+├── 20_SETTINGS
+│   ├── Settings.gs
+│   ├── SettingCreate.gs
+│   ├── SettingRead.gs
+│   ├── SettingUpdate.gs
+│   ├── SettingDelete.gs
+│   ├── SystemConfig.gs
+│   ├── FeatureFlags.gs
+│   └── MaintenanceMode.gs
+│
+├── 21_LOGS
+│   ├── Logs.gs
+│   ├── LogCreate.gs
+│   ├── LogRead.gs
+│   ├── LogDelete.gs
+│   ├── AdminLogs.gs
+│   ├── SecurityLogs.gs
+│   ├── LoginLogs.gs
+│   ├── FileLogs.gs
+│   ├── ProjectLogs.gs
+│   ├── EmailLogs.gs
+│   └── StorageLogs.gs
+│
+├── 22_SECURITY
+│   ├── Security.gs
+│   ├── Hashing.gs
+│   ├── PasswordHashing.gs
+│   ├── TokenSecurity.gs
+│   ├── Validation.gs
+│   ├── Sanitization.gs
+│   ├── RateLimit.gs
+│   ├── DeviceSecurity.gs
+│   ├── IpSecurity.gs
+│   └── SecurityChecks.gs
+│
+├── 23_BACKUPS
+│   ├── Backups.gs
+│   ├── BackupCreate.gs
+│   ├── BackupRead.gs
+│   ├── BackupRestore.gs
+│   ├── BackupDelete.gs
+│   ├── DatabaseBackup.gs
+│   ├── FileBackup.gs
+│   └── BackupScheduler.gs
+│
+├── 24_VALIDATION
+│   ├── Validation.gs
+│   ├── EmailValidation.gs
+│   ├── PhoneValidation.gs
+│   ├── PasswordValidation.gs
+│   ├── UsernameValidation.gs
+│   ├── FileValidation.gs
+│   └── ProjectValidation.gs
+│
+└── 25_UTILITIES
+    ├── IdGenerator.gs
+    ├── TokenGenerator.gs
+    ├── DateUtils.gs
+    ├── JsonUtils.gs
+    ├── StringUtils.gs
+    ├── ArrayUtils.gs
+    └── ObjectUtils.gs
