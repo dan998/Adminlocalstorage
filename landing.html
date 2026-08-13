@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Cloud Project Platform</title>
+
+    <link rel="stylesheet" href="css/landing.css">
+</head>
+
+<body>
+
+<!-- =====================================================
+     NAVBAR
+===================================================== -->
+
+<header class="navbar">
+
+    <div class="nav-container">
+
+        <a href="#" class="brand">
+            <div class="brand-icon">☁</div>
+
+            <div class="brand-text">
+                <strong>Cloud Project</strong>
+                <span>Platform</span>
+            </div>
+        </a>
+
+
+        <nav class="nav-links">
+
+            <a href="#platform" data-i18n="navPlatform">
+                Platform
+            </a>
+
+            <a href="#features" data-i18n="navFeatures">
+                Features
+            </a>
+
+            <a href="#architecture" data-i18n="navArchitecture">
+                Architecture
+            </a>
+
+            <a href="#security" data-i18n="navSecurity">
+                Security
+            </a>
+
+            <a href="#developers" data-i18n="navDevelopers">
+                Developers
+            </a>
+
+        </nav>
+
+
+        <div class="nav-actions">
+
+            <select id="languageSelector">
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+            </select>
+
+            <button
+                id="themeToggle"
+                class="icon-button"
+                aria-label="Toggle theme"
+            >
+                ◐
+            </button>
+
+            <a
+                href="pages/login.html"
+                class="btn btn-outline"
+                data-i18n="login"
+            >
+                Login
+            </a>
+
+            <a
+                href="pages/register.html"
+                class="btn btn-primary"
+                data-i18n="getStarted"
+            >
+                Get Started
+            </a>
+
+        </div>
+
+        <button
+            id="mobileMenuButton"
+            class="mobile-menu-button"
+        >
+            ☰
+        </button>
+
+    </div>
+
+</header>
+
+
+<!-- =====================================================
+     MOBILE MENU
+===================================================== -->
+
+<div id="mobileMenu" class="mobile-menu">
+
+    <a href="#platform" data-i18n="navPlatform">
+        Platform
+    </a>
+
+    <a href="#features" data-i18n="navFeatures">
+        Features
+    </a>
+
+    <a href="#architecture" data-i18n="navArchitecture">
+        Architecture
+    </a>
+
+    <a href="#security" data-i18n="navSecurity">
+        Security
+    </a>
+
+    <a href="#developers" data-i18n="navDevelopers">
+        Developers
+    </a>
+
+    <a href="pages/login.html" data-i18n="login">
+        Login
+    </a>
+
+    <a href="pages/register.html" data-i18n="getStarted">
+        Get Started
+    </a>
+
+</div>
+
+
+<!-- =====================================================
+     HERO
+===================================================== -->
+
+<main>
+
+<section class="hero">
+
+    <div class="hero-background"></div>
+
+    <div class="container hero-grid">
+
+        <div class="hero-content">
+
+            <div class="status-badge">
+                <span class="status-dot"></span>
+
+                <span data-i18n="systemOperational">
+                    All Systems Operational
+                </span>
+            </div>
+
+
+            <h1>
+
+                <span data-i18n="heroTitle">
+                    Build. Store. Manage.
+                </span>
+
+                <span class="gradient-text"
+                      data-i18n="heroTitleHighlight">
+                    Scale.
+                </span>
+
+            </h1>
+
+
+            <p
+                class="hero-description"
+                data-i18n="heroDescription"
+            >
+                A complete cloud project platform for managing
+                projects, files, storage, users, APIs, security,
+                data, email and system infrastructure.
+            </p>
+
+
+            <div class="hero-buttons">
+
+                <a
+                    href="pages/register.html"
+                    class="btn btn-primary btn-large"
+                    data-i18n="createAccount"
+                >
+                    Create Account →
+                </a>
+
+                <a
+                    href="#architecture"
+                    class="btn btn-glass btn-large"
+                    data-i18n="explorePlatform"
+                >
+                    Explore Platform
+                </a>
+
+            </div>
+
+
+            <div class="hero-stats">
+
+                <div>
+                    <strong>25+</strong>
+                    <span data-i18n="coreModules">
+                        Core Modules
+                    </span>
+                </div>
+
+                <div>
+                    <strong>100+</strong>
+                    <span data-i18n="apiServices">
+                        API Services
+                    </span>
+                </div>
+
+                <div>
+                    <strong>∞</strong>
+                    <span data-i18n="possibilities">
+                        Possibilities
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             PLATFORM STATUS CARD
+        ================================================== -->
+
+        <div class="hero-dashboard">
+
+            <div class="dashboard-window">
+
+                <div class="window-header">
+
+                    <div class="window-controls">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+
+                    <span>
+                        Cloud Platform
+                    </span>
+
+                    <span>•••</span>
+
+                </div>
+
+
+                <div class="dashboard-body">
+
+                    <div class="dashboard-title">
+                        <span>System Overview</span>
+
+                        <span class="online">
+                            ● Online
+                        </span>
+                    </div>
+
+
+                    <div class="status-grid">
+
+                        <div class="status-card">
+
+                            <div class="status-icon">
+                                API
+                            </div>
+
+                            <strong>API</strong>
+
+                            <span class="online">
+                                Operational
+                            </span>
+
+                        </div>
+
+
+                        <div class="status-card">
+
+                            <div class="status-icon">
+                                DB
+                            </div>
+
+                            <strong>Database</strong>
+
+                            <span class="online">
+                                Operational
+                            </span>
+
+                        </div>
+
+
+                        <div class="status-card">
+
+                            <div class="status-icon">
+                                ST
+                            </div>
+
+                            <strong>Storage</strong>
+
+                            <span class="online">
+                                Operational
+                            </span>
+
+                        </div>
+
+
+                        <div class="status-card">
+
+                            <div class="status-icon">
+                                EM
+                            </div>
+
+                            <strong>Email</strong>
+
+                            <span class="online">
+                                Operational
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="usage-card">
+
+                        <div class="usage-header">
+
+                            <span>
+                                Storage Usage
+                            </span>
+
+                            <strong>
+                                68%
+                            </strong>
+
+                        </div>
+
+                        <div class="progress">
+                            <span style="width:68%"></span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="activity-card">
+
+                        <div>
+                            <span class="activity-icon">
+                                ↑
+                            </span>
+
+                            <div>
+                                <strong>
+                                    Project uploaded
+                                </strong>
+
+                                <small>
+                                    2 minutes ago
+                                </small>
+                            </div>
+                        </div>
+
+
+                        <div>
+                            <span class="activity-icon">
+                                ✓
+                            </span>
+
+                            <div>
+                                <strong>
+                                    Backup completed
+                                </strong>
+
+                                <small>
+                                    8 minutes ago
+                                </small>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     PLATFORM
+===================================================== -->
+
+<section
+    id="platform"
+    class="section"
+>
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <span class="section-label">
+                PLATFORM
+            </span>
+
+            <h2 data-i18n="platformTitle">
+                Everything your projects need
+            </h2>
+
+            <p data-i18n="platformDescription">
+                One unified infrastructure for your entire
+                project lifecycle.
+            </p>
+
+        </div>
+
+
+        <div class="module-grid">
+
+
+            <!-- PROJECTS -->
+
+            <article class="module-card">
+
+                <div class="module-icon">
+                    ◈
+                </div>
+
+                <div>
+
+                    <h3 data-i18n="projects">
+                        Projects
+                    </h3>
+
+                    <p>
+                        Create, manage and organize projects
+                        with team access and project history.
+                    </p>
+
+                </div>
+
+                <span class="module-number">
+                    05
+                </span>
+
+            </article>
+
+
+            <!-- FILES -->
+
+            <article class="module-card">
+
+                <div class="module-icon">
+                    □
+                </div>
+
+                <div>
+
+                    <h3 data-i18n="files">
+                        Files
+                    </h3>
+
+                    <p>
+                        Upload, download, preview, search,
+                        move and manage project files.
+                    </p>
+
+                </div>
+
+                <span class="module-number">
+                    07
+                </span>
+
+            </article>
+
+
+            <!-- STORAGE -->
+
+            <article class="module-card">
+
+                <div class="module-icon">
+                    ▣
+                </div>
+
+                <div>
+
+                    <h3 data-i18n="storage">
+                        Cloud Storage
+                    </h3>
+
+                    <p>
+                        Storage rooms, nodes, quotas,
+                        allocation and health monitoring.
+                    </p>
+
+                </div>
+
+                <span class="module-number">
+                    11
+                </span>
+
+            </article>
+
+
+            <!-- SHEETS -->
+
+            <article class="module-card">
+
+                <div class="module-icon">
+                    ▤
+                </div>
+
+                <div>
+
+                    <h3>
+                        Google Sheets
+                    </h3>
+
+                    <p>
+                        Use Google Sheets as structured
+                        project data and database storage.
+                    </p>
+
+                </div>
+
+                <span class="module-number">
+                    13
+                </span>
+
+            </article>
+
+
+            <!-- EMAIL -->
+
+            <article class="module-card">
+
+                <div class="module-icon">
+                    @
+                </div>
+
+                <div>
+
+                    <h3>
+                        Email
+                    </h3>
+
+                    <p>
+                        Verification, password reset,
+                        notifications, queues and broadcasts.
+                    </p>
+
+                </div>
+
+                <span class="module-number">
+                    14
+                </span>
+
+            </article>
+
+
+            <!-- SECURITY -->
+
+            <article class="module-card">
+
+                <div class="module-icon">
+                    ◉
+                </div>
+
+                <div>
+
+                    <h3 data-i18n="security">
+                        Security
+                    </h3>
+
+                    <p>
+                        Authentication, permissions,
+                        sessions, tokens and security logs.
+                    </p>
+
+                </div>
+
+                <span class="module-number">
+                    22
+                </span>
+
+            </article>
+
+
+            <!-- ANALYTICS -->
+
+            <article class="module-card">
+
+                <div class="module-icon">
+                    ◒
+                </div>
+
+                <div>
+
+                    <h3>
+                        Analytics
+                    </h3>
+
+                    <p>
+                        Monitor projects, users, storage,
+                        sessions and system activity.
+                    </p>
+
+                </div>
+
+                <span class="module-number">
+                    18
+                </span>
+
+            </article>
+
+
+            <!-- BACKUPS -->
+
+            <article class="module-card">
+
+                <div class="module-icon">
+                    ↻
+                </div>
+
+                <div>
+
+                    <h3>
+                        Backups
+                    </h3>
+
+                    <p>
+                        Create, restore, export and
+                        schedule project backups.
+                    </p>
+
+                </div>
+
+                <span class="module-number">
+                    23
+                </span>
+
+            </article>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     ARCHITECTURE
+===================================================== -->
+
+<section
+    id="architecture"
+    class="section architecture-section"
+>
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <span class="section-label">
+                ARCHITECTURE
+            </span>
+
+            <h2>
+                Built as a modular cloud system
+            </h2>
+
+            <p>
+                Every major platform capability has its
+                own dedicated module.
+            </p>
+
+        </div>
+
+
+        <div class="architecture">
+
+            <div class="architecture-layer">
+
+                <span>00</span>
+
+                <div>
+                    <strong>CORE</strong>
+
+                    <small>
+                        Configuration · Database · Schema · Helpers
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="architecture-arrow">
+                ↓
+            </div>
+
+
+            <div class="architecture-layer active">
+
+                <span>01</span>
+
+                <div>
+                    <strong>API</strong>
+
+                    <small>
+                        Routing · Authentication · Projects · Files
+                        · Storage · Security
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="architecture-arrow">
+                ↓
+            </div>
+
+
+            <div class="architecture-layer">
+
+                <span>02–10</span>
+
+                <div>
+                    <strong>APPLICATION</strong>
+
+                    <small>
+                        Authentication · Users · Projects · Files
+                        · Folders · Versions · History
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="architecture-arrow">
+                ↓
+            </div>
+
+
+            <div class="architecture-layer">
+
+                <span>11–17</span>
+
+                <div>
+                    <strong>INFRASTRUCTURE</strong>
+
+                    <small>
+                        Storage · Drive · Sheets · Email ·
+                        Notifications · Roles · Permissions
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="architecture-arrow">
+                ↓
+            </div>
+
+
+            <div class="architecture-layer">
+
+                <span>18–25</span>
+
+                <div>
+                    <strong>SYSTEM</strong>
+
+                    <small>
+                        Dashboard · Sessions · Settings · Logs
+                        · Security · Backups · Validation
+                    </small>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     FEATURES
+===================================================== -->
+
+<section
+    id="features"
+    class="section"
+>
+
+    <div class="container">
+
+        <div class="feature-layout">
+
+            <div>
+
+                <span class="section-label">
+                    FEATURES
+                </span>
+
+                <h2>
+                    Designed for complete project control
+                </h2>
+
+                <p>
+                    Manage your entire cloud environment
+                    from one platform.
+                </p>
+
+            </div>
+
+
+            <div class="feature-list">
+
+                <div class="feature-item">
+
+                    <span>01</span>
+
+                    <div>
+                        <h3>Project Management</h3>
+
+                        <p>
+                            Projects, members, access,
+                            versions and activity history.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="feature-item">
+
+                    <span>02</span>
+
+                    <div>
+                        <h3>Advanced Storage</h3>
+
+                        <p>
+                            Rooms, nodes, quotas,
+                            allocation and monitoring.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="feature-item">
+
+                    <span>03</span>
+
+                    <div>
+                        <h3>Enterprise Security</h3>
+
+                        <p>
+                            Sessions, tokens, permissions,
+                            roles and security monitoring.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="feature-item">
+
+                    <span>04</span>
+
+                    <div>
+                        <h3>Powerful API</h3>
+
+                        <p>
+                            Modular routes, middleware,
+                            webhooks, queues and tasks.
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     SECURITY
+===================================================== -->
+
+<section
+    id="security"
+    class="section security-section"
+>
+
+    <div class="container">
+
+        <div class="security-content">
+
+            <div>
+
+                <span class="section-label">
+                    SECURITY
+                </span>
+
+                <h2>
+                    Security built into the architecture
+                </h2>
+
+                <p>
+                    Authentication and authorization are
+                    integrated throughout the platform.
+                </p>
+
+            </div>
+
+
+            <div class="security-grid">
+
+                <div>
+                    <strong>AUTH</strong>
+                    <span>Authentication</span>
+                </div>
+
+                <div>
+                    <strong>RBAC</strong>
+                    <span>Roles & Permissions</span>
+                </div>
+
+                <div>
+                    <strong>SESS</strong>
+                    <span>Session Security</span>
+                </div>
+
+                <div>
+                    <strong>AUDIT</strong>
+                    <span>Audit Logs</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     DEVELOPERS
+===================================================== -->
+
+<section
+    id="developers"
+    class="section developer-section"
+>
+
+    <div class="container">
+
+        <div class="developer-box">
+
+            <div>
+
+                <span class="section-label">
+                    DEVELOPERS
+                </span>
+
+                <h2>
+                    Build on your platform
+                </h2>
+
+                <p>
+                    Use API tokens, webhooks, integrations,
+                    imports, exports, tasks and scheduled jobs
+                    to extend the platform.
+                </p>
+
+            </div>
+
+
+            <div class="code-window">
+
+                <div class="code-header">
+                    <span>API Request</span>
+                    <span>●</span>
+                </div>
+
+<pre><code>{
+  "action": "getProject",
+  "projectId": "PROJECT_ID",
+  "sessionToken": "SESSION_TOKEN"
+}</code></pre>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     CTA
+===================================================== -->
+
+<section class="cta-section">
+
+    <div class="container">
+
+        <div class="cta-box">
+
+            <span class="section-label">
+                CLOUD PROJECT PLATFORM
+            </span>
+
+            <h2>
+                Ready to build your cloud workspace?
+            </h2>
+
+            <p>
+                Create your account and start managing
+                projects, files, storage and infrastructure.
+            </p>
+
+            <div class="hero-buttons">
+
+                <a
+                    href="pages/register.html"
+                    class="btn btn-primary btn-large"
+                >
+                    Create Account →
+                </a>
+
+                <a
+                    href="pages/login.html"
+                    class="btn btn-glass btn-large"
+                >
+                    Login
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+</main>
+
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
+<footer class="footer">
+
+    <div class="container footer-grid">
+
+        <div>
+
+            <a href="#" class="brand">
+
+                <div class="brand-icon">
+                    ☁
+                </div>
+
+                <div class="brand-text">
+                    <strong>Cloud Project</strong>
+                    <span>Platform</span>
+                </div>
+
+            </a>
+
+            <p>
+                Complete cloud project infrastructure.
+            </p>
+
+        </div>
+
+
+        <div>
+
+            <h4>Platform</h4>
+
+            <a href="#platform">Projects</a>
+            <a href="#platform">Storage</a>
+            <a href="#platform">Files</a>
+            <a href="#platform">Security</a>
+
+        </div>
+
+
+        <div>
+
+            <h4>Resources</h4>
+
+            <a href="#developers">API</a>
+            <a href="#architecture">Architecture</a>
+            <a href="#developers">Documentation</a>
+
+        </div>
+
+
+        <div>
+
+            <h4>Account</h4>
+
+            <a href="pages/login.html">
+                Login
+            </a>
+
+            <a href="pages/register.html">
+                Register
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <div class="footer-bottom">
+
+        <span>
+            © 2026 Cloud Project Platform
+        </span>
+
+        <span>
+            English · Français
+        </span>
+
+    </div>
+
+</footer>
+
+
+<script src="js/language.js"></script>
+
+</body>
+</html>
